@@ -12,13 +12,37 @@ echo.
 
 :: 1. Kiem tra moi truong he thong (Python va Node.js)
 echo [1/5] Kiem tra moi truong he thong...
-where python >nul 2>nul
-if errorlevel 1 goto :err_no_python
+set PYTHON_CMD=
+python -c "import sys" >nul 2>nul
+if not errorlevel 1 (
+    set PYTHON_CMD=python
+    goto :python_found
+)
+py -3 -c "import sys" >nul 2>nul
+if not errorlevel 1 (
+    set PYTHON_CMD=py -3
+    goto :python_found
+)
+py -c "import sys" >nul 2>nul
+if not errorlevel 1 (
+    set PYTHON_CMD=py
+    goto :python_found
+)
 
+:err_no_python
+echo.
+echo [LOI] Khong tim thay Python thuc su hoat dong tren he thong!
+echo Vui long cai dat Python 3.10 tro len tai: https://www.python.org/downloads/
+echo *Luu y: Nho tick chon vao o 'Add python.exe to PATH' khi cai dat.
+echo.
+pause
+exit /b 1
+
+:python_found
 where npm >nul 2>nul
 if errorlevel 1 goto :err_no_npm
 
-echo [OK] Python va Node.js da san sang.
+echo [OK] Python (!PYTHON_CMD!) va Node.js da san sang.
 echo.
 
 :: 2. Kiem tra cap nhat tu GitHub (neu co git)
@@ -78,20 +102,38 @@ if exist "%~dp0backend\.env.example" (
 )
 
 :check_backend_venv
-:: 4. Tu dong cai dat Backend neu la may moi (chua co venv)
-if exist "%~dp0backend\venv\Scripts\python.exe" goto :check_frontend_deps
+:: 4. Tu dong cai dat Backend neu la may moi
+if exist "%~dp0backend\venv\Scripts\python.exe" (
+    set RUN_PY="%~dp0backend\venv\Scripts\python.exe"
+    goto :check_frontend_deps
+)
+
 echo.
 echo ==========================================================
 echo   [LAN DAU CHAY] Phat hien chua co moi truong Backend venv!
 echo   Dang tu dong khoi tao Python Virtual Environment...
 echo ==========================================================
-python -m venv "%~dp0backend\venv"
-if errorlevel 1 goto :err_create_venv
+pushd "%~dp0backend"
+if exist "venv" rmdir /s /q "venv" >nul 2>nul
+!PYTHON_CMD! -m venv venv
+if exist "venv\Scripts\python.exe" (
+    set RUN_PY="%~dp0backend\venv\Scripts\python.exe"
+    echo [OK] Da tao thanh cong Virtual Environment venv.
+) else (
+    echo [Notice] Khong the tao thu muc venv rieng, tu dong dung truc tiep !PYTHON_CMD!...
+    set RUN_PY=!PYTHON_CMD!
+)
 
 echo [Setup] Dang cai dat cac thu vien backend tu requirements.txt...
 echo [Luu y] Qua trinh nay mat khoang 1-2 phut trong lan dau tien chay.
-"%~dp0backend\venv\Scripts\python.exe" -m pip install --upgrade pip --quiet
-"%~dp0backend\venv\Scripts\python.exe" -m pip install -r "%~dp0backend\requirements.txt"
+call !RUN_PY! -m pip install --upgrade pip --quiet
+call !RUN_PY! -m pip install -r requirements.txt
+if errorlevel 1 (
+    echo [Thu lai] Dang thu cai dat voi quyen nguoi dung...
+    call !RUN_PY! -m pip install -r requirements.txt --user
+)
+popd
+
 if errorlevel 1 goto :err_pip_install
 echo [OK] Da cai dat xong moi truong Backend!
 echo.
@@ -105,7 +147,7 @@ echo   [LAN DAU CHAY] Phat hien chua co thu vien Frontend node_modules!
 echo   Dang tu dong chay npm install...
 echo ==========================================================
 pushd "%~dp0frontend"
-call npm.cmd install
+call npm install
 popd
 if errorlevel 1 goto :err_npm_install
 echo [OK] Da cai dat xong thu vien Frontend!
@@ -118,12 +160,20 @@ for /f "usebackq tokens=*" %%i in (`powershell -NoProfile -Command "(Test-Connec
     if not "%%i"=="" set LOCAL_IP=%%i
 )
 
+if not defined RUN_PY (
+    if exist "%~dp0backend\venv\Scripts\python.exe" (
+        set RUN_PY="%~dp0backend\venv\Scripts\python.exe"
+    ) else (
+        set RUN_PY=!PYTHON_CMD!
+    )
+)
+
 :: 7. Khoi dong Backend va Frontend thu nho xuong Taskbar
 echo [3/5] Khoi dong Backend FastAPI tren cong 8000...
-start /min "Chronomind_Backend_Server" cmd /c "cd /d "%~dp0backend" && venv\Scripts\python.exe -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+start /min "Chronomind_Backend_Server" cmd /c "cd /d "%~dp0backend" && !RUN_PY! -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
 echo [4/5] Khoi dong Frontend Next.js tren cong 3000...
-start /min "Chronomind_Frontend_Server" cmd /c "cd /d "%~dp0frontend" && npm.cmd run dev -- -H 0.0.0.0 -p 3000"
+start /min "Chronomind_Frontend_Server" cmd /c "cd /d "%~dp0frontend" && npm run dev -- -H 0.0.0.0 -p 3000"
 
 :: 8. Cho 3 giay va tu dong mo trinh duyet Web
 echo [5/5] Dang ket noi va mo trinh duyet Web...
@@ -151,26 +201,10 @@ taskkill /fi "WINDOWTITLE eq Chronomind_Frontend_Server*" /f >nul 2>&1
 exit /b 0
 
 :: CÁC NHÃN XỬ LÝ LỖI
-:err_no_python
-echo.
-echo [LOI] Khong tim thay Python tren he thong!
-echo Vui long cai dat Python 3.10 tro len tai: https://www.python.org/downloads/
-echo *Luu y: Nho tick chon vao o 'Add python.exe to PATH' khi cai dat.
-echo.
-pause
-exit /b 1
-
 :err_no_npm
 echo.
 echo [LOI] Khong tim thay Node.js hoac npm tren he thong!
 echo Vui long cai dat Node.js tai: https://nodejs.org/
-echo.
-pause
-exit /b 1
-
-:err_create_venv
-echo.
-echo [LOI] Khong the tao virtual environment. Vui long kiem tra lai quyen truy cap hoac Python.
 echo.
 pause
 exit /b 1
