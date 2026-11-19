@@ -176,10 +176,10 @@ if exist "venv\Scripts\python.exe" (
 echo [Setup] Dang cai dat cac thu vien backend tu requirements.txt...
 echo [Luu y] Qua trinh nay mat khoang 1-2 phut trong lan dau tien chay.
 call !RUN_PY! -m pip install --upgrade pip --quiet
-call !RUN_PY! -m pip install -r requirements.txt
+call !RUN_PY! -m pip install --prefer-binary -r requirements.txt
 if errorlevel 1 (
-    echo [Thu lai] Dang thu cai dat voi quyen nguoi dung...
-    call !RUN_PY! -m pip install -r requirements.txt --user
+    echo [Thu lai] Dang thu cai dat voi che do chi dung binary da bien dich...
+    call !RUN_PY! -m pip install --only-binary :all: -r requirements.txt
 )
 popd
 

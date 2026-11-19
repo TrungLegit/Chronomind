@@ -81,7 +81,7 @@ if [ ! -d "backend/venv" ]; then
     fi
     echo "[Setup] Đang cài đặt thư viện backend (requirements.txt)..."
     ./backend/venv/bin/pip install --upgrade pip --quiet
-    ./backend/venv/bin/pip install -r backend/requirements.txt
+    ./backend/venv/bin/pip install --prefer-binary -r backend/requirements.txt
     if [ $? -ne 0 ]; then
         echo "[LỖI] Cài đặt dependencies backend thất bại."
         exit 1
