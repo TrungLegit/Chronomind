@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
-import { X, Clock, Zap, Wrench, Loader2, Sparkles, ArrowRight } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { X, Clock, Zap, Wrench, Loader2, Sparkles, ArrowRight, RotateCcw } from "lucide-react";
 import { ProjectCreateInput } from "@/types";
+import { api } from "@/services/api";
 
 interface ProjectWizardModalProps {
   isOpen: boolean;
@@ -50,6 +51,84 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
   const [toolsResources, setToolsResources] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
+  const [hasDraft, setHasDraft] = useState(false);
+
+  // Load saved draft on open
+  useEffect(() => {
+    if (!isOpen) return;
+
+    try {
+      const local = localStorage.getItem("chronomind_wizard_draft");
+      if (local) {
+        const parsed = JSON.parse(local);
+        if (parsed.title || parsed.description) {
+          setTitle(parsed.title || "");
+          setDescription(parsed.description || "");
+          setTargetGoal(parsed.target_goal || "");
+          setHoursPerWeek(parsed.available_hours_per_week || 12);
+          setSkillLevel(parsed.skill_level || "Intermediate");
+          setToolsResources(parsed.tools_resources || "");
+          setHasDraft(true);
+          return;
+        }
+      }
+    } catch (e) {
+      // Ignore
+    }
+
+    // Try backend draft if local is empty
+    api.getDraft().then((draft) => {
+      if (draft && (draft.title || draft.description)) {
+        setTitle(draft.title || "");
+        setDescription(draft.description || "");
+        setTargetGoal(draft.target_goal || "");
+        setHoursPerWeek(draft.available_hours_per_week || 12);
+        setSkillLevel(draft.skill_level || "Intermediate");
+        setToolsResources(draft.tools_resources || "");
+        setHasDraft(true);
+      }
+    });
+  }, [isOpen]);
+
+  // Auto-save draft on changes (debounced)
+  useEffect(() => {
+    if (!isOpen || loading) return;
+
+    const draftData = {
+      title,
+      description,
+      target_goal: targetGoal,
+      available_hours_per_week: hoursPerWeek,
+      skill_level: skillLevel,
+      tools_resources: toolsResources,
+      updated_at: new Date().toISOString(),
+    };
+
+    const timer = setTimeout(() => {
+      try {
+        localStorage.setItem("chronomind_wizard_draft", JSON.stringify(draftData));
+        api.saveDraft(draftData);
+      } catch (e) {
+        // Ignore
+      }
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [title, description, targetGoal, hoursPerWeek, skillLevel, toolsResources, isOpen, loading]);
+
+  const handleClearDraft = () => {
+    setTitle("");
+    setDescription("");
+    setTargetGoal("");
+    setHoursPerWeek(12);
+    setSkillLevel("Intermediate");
+    setToolsResources("");
+    setHasDraft(false);
+    try {
+      localStorage.removeItem("chronomind_wizard_draft");
+      api.clearDraft();
+    } catch (e) {}
+  };
 
   if (!isOpen) return null;
 
@@ -91,6 +170,11 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
         tools_resources: toolsResources || undefined,
       });
       clearInterval(interval);
+      // Clear draft upon successful project creation
+      try {
+        localStorage.removeItem("chronomind_wizard_draft");
+        api.clearDraft();
+      } catch (e) {}
       onClose();
     } catch (err: any) {
       clearInterval(interval);
@@ -157,6 +241,23 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
                 Nhập ý tưởng sơ bộ. AI sẽ tính độ khó, rủi ro tiềm ẩn và tự động chia nhỏ các giai đoạn.
               </p>
             </div>
+
+            {/* Auto-saved draft restore notification */}
+            {hasDraft && (
+              <div className="flex items-center justify-between bg-[#eaf1fb] border border-[#c2e7ff] text-[#001d35] rounded-xl px-3.5 py-2 text-xs mb-4">
+                <span className="flex items-center gap-1.5 font-medium">
+                  <RotateCcw className="h-3.5 w-3.5 text-[#0b57d0]" />
+                  <span>Đã khôi phục nội dung bạn đang nhập dở trước đó</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={handleClearDraft}
+                  className="text-[#0b57d0] hover:underline font-semibold ml-2 cursor-pointer"
+                >
+                  Xóa nháp
+                </button>
+              </div>
+            )}
 
             {/* Quick Templates */}
             <div className="mb-4 rounded-2xl border border-[#e5e7eb] bg-[#f8fafd] p-3">

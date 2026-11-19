@@ -81,4 +81,54 @@ export const api = {
   getExportWordUrl(id: string): string {
     return `${API_BASE_URL}/projects/${id}/export/word`;
   },
+
+  // Session & Local Persistence methods
+  async getLastActiveProject(): Promise<{
+    has_recent: boolean;
+    project: any;
+    next_task: any;
+  }> {
+    const res = await fetch(`${API_BASE_URL}/projects/session/last-active`, { cache: "no-store" });
+    if (!res.ok) return { has_recent: false, project: null, next_task: null };
+    return res.json();
+  },
+
+  async markProjectAsActive(id: string): Promise<void> {
+    try {
+      await fetch(`${API_BASE_URL}/projects/${id}/mark-active`, { method: "POST" });
+    } catch (e) {
+      // Ignore network errors on local
+    }
+  },
+
+  async saveDraft(draft: any): Promise<void> {
+    try {
+      await fetch(`${API_BASE_URL}/projects/session/draft`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(draft),
+      });
+    } catch (e) {
+      // Ignore
+    }
+  },
+
+  async getDraft(): Promise<any> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/projects/session/draft`, { cache: "no-store" });
+      if (!res.ok) return null;
+      return res.json();
+    } catch (e) {
+      return null;
+    }
+  },
+
+  async clearDraft(): Promise<void> {
+    try {
+      await fetch(`${API_BASE_URL}/projects/session/draft`, { method: "DELETE" });
+    } catch (e) {
+      // Ignore
+    }
+  },
 };
+

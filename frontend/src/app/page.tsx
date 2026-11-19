@@ -20,6 +20,7 @@ import { TimelineRoadmap } from "@/components/TimelineRoadmap";
 import { RescheduleModal } from "@/components/RescheduleModal";
 import { ExtensionHistoryDrawer } from "@/components/ExtensionHistoryDrawer";
 import { ExportMenu } from "@/components/ExportMenu";
+import { ResumeProjectBanner } from "@/components/ResumeProjectBanner";
 import { api } from "@/services/api";
 import { Project, ProjectSummary, ProjectCreateInput, ExtensionInput } from "@/types";
 
@@ -30,15 +31,34 @@ export default function Home() {
   const [isWizardOpen, setIsWizardOpen] = useState<boolean>(false);
   const [isRescheduleOpen, setIsRescheduleOpen] = useState<boolean>(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false);
+  const [recentSession, setRecentSession] = useState<{
+    project: any;
+    next_task: any;
+  } | null>(null);
+  const [showResumeBanner, setShowResumeBanner] = useState<boolean>(true);
 
   const loadProjects = async (selectId?: string) => {
     try {
-      const list = await api.getProjects();
+      const [list, session] = await Promise.all([
+        api.getProjects(),
+        api.getLastActiveProject(),
+      ]);
+
       setProjects(list);
+      if (session && session.has_recent && session.project) {
+        setRecentSession({
+          project: session.project,
+          next_task: session.next_task,
+        });
+      }
+
       if (list.length > 0) {
-        const idToLoad = selectId || (currentProject ? currentProject.id : list[0].id);
-        const exists = list.some((p) => p.id === idToLoad);
-        loadProjectDetail(exists ? idToLoad : list[0].id);
+        // Check local storage memory first, then session memory, then fallback
+        const savedLocalId = typeof window !== "undefined" ? localStorage.getItem("chronomind_last_active_project_id") : null;
+        const candidateId = selectId || savedLocalId || (session?.project?.id) || list[0].id;
+        const exists = list.some((p) => p.id === candidateId);
+        const idToLoad = exists ? candidateId : list[0].id;
+        loadProjectDetail(idToLoad);
       } else {
         setCurrentProject(null);
       }
@@ -53,6 +73,11 @@ export default function Home() {
     try {
       const detail = await api.getProject(id);
       setCurrentProject(detail);
+      // Persist active project locally
+      if (typeof window !== "undefined") {
+        localStorage.setItem("chronomind_last_active_project_id", id);
+      }
+      api.markProjectAsActive(id);
     } catch (err) {
       console.error("Error loading project detail:", err);
     }
@@ -131,6 +156,19 @@ export default function Home() {
       />
 
       <main className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 py-6 space-y-6">
+        {/* Local Persistence: Resume where you left off banner */}
+        {recentSession && showResumeBanner && recentSession.project && (
+          <ResumeProjectBanner
+            recentData={recentSession}
+            currentProjectId={currentProject?.id}
+            onResume={(id) => {
+              loadProjectDetail(id);
+              setShowResumeBanner(false);
+            }}
+            onDismiss={() => setShowResumeBanner(false)}
+          />
+        )}
+
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24 text-[#5f6368] space-y-3">
             <Loader2 className="h-8 w-8 animate-spin text-[#0b57d0]" />

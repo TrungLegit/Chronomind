@@ -133,3 +133,11 @@ class ExtensionLog(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     project = relationship("Project", back_populates="extensions")
+
+class SystemState(Base):
+    __tablename__ = "system_state"
+
+    key = Column(String(100), primary_key=True)
+    value = Column(Text, nullable=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+

@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.models import (
-    Project, Prerequisite, Phase, Task, ExtensionLog,
+    Project, Prerequisite, Phase, Task, ExtensionLog, SystemState,
     ProjectStatus, PhaseStatus, TaskStatus
 )
 from app.schemas.schemas import (
@@ -241,3 +241,111 @@ def delete_project(project_id: str, db: Session = Depends(get_db)):
     db.delete(project)
     db.commit()
     return None
+
+# ========================================================
+# LOCAL PERSISTENCE & SESSION RECOVERY ENDPOINTS
+# ========================================================
+
+@router.get("/session/last-active")
+def get_last_active_project(db: Session = Depends(get_db)):
+    """
+    Returns the user's last active project and the next pending task
+    so they can immediately resume where they left off.
+    """
+    state = db.query(SystemState).filter(SystemState.key == "last_active_project_id").first()
+    project = None
+    if state and state.value:
+        project = db.query(Project).filter(Project.id == state.value).first()
+
+    if not project:
+        # Fallback to the most recently updated project
+        project = db.query(Project).order_by(Project.updated_at.desc()).first()
+
+    if not project:
+        return {"has_recent": False, "project": None, "next_task": None}
+
+    metrics = compute_project_metrics(project)
+
+    # Find the next pending task
+    next_task = None
+    for phase in sorted(project.phases, key=lambda p: p.phase_number):
+        for task in sorted(phase.tasks, key=lambda t: t.order_index):
+            if task.status != TaskStatus.DONE.value:
+                next_task = {
+                    "id": task.id,
+                    "title": task.title,
+                    "phase_title": phase.title,
+                    "phase_number": phase.phase_number,
+                    "estimated_hours": task.estimated_hours,
+                    "status": task.status,
+                    "is_milestone": task.is_milestone
+                }
+                break
+        if next_task:
+            break
+
+    return {
+        "has_recent": True,
+        "project": {
+            "id": project.id,
+            "title": project.title,
+            "description": project.description,
+            "status": project.status,
+            "progress_percentage": metrics["progress_percentage"],
+            "total_tasks": metrics["total_tasks"],
+            "completed_tasks": metrics["completed_tasks"],
+            "updated_at": project.updated_at,
+            "kick_off_date": project.kick_off_date,
+            "estimated_completion_date": project.estimated_completion_date
+        },
+        "next_task": next_task
+    }
+
+@router.post("/{project_id}/mark-active")
+def mark_project_as_active(project_id: str, db: Session = Depends(get_db)):
+    """Marks a project as the currently active project in local persistence."""
+    project = db.query(Project).filter(Project.id == project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    project.updated_at = datetime.utcnow()
+    state = db.query(SystemState).filter(SystemState.key == "last_active_project_id").first()
+    if not state:
+        state = SystemState(key="last_active_project_id", value=project_id)
+        db.add(state)
+    else:
+        state.value = project_id
+    db.commit()
+    return {"status": "ok", "project_id": project_id}
+
+@router.post("/session/draft")
+def save_wizard_draft(draft: dict, db: Session = Depends(get_db)):
+    """Saves user's in-progress project input draft locally so they never lose their ideas."""
+    state = db.query(SystemState).filter(SystemState.key == "wizard_draft").first()
+    json_str = json.dumps(draft, ensure_ascii=False)
+    if not state:
+        state = SystemState(key="wizard_draft", value=json_str)
+        db.add(state)
+    else:
+        state.value = json_str
+    db.commit()
+    return {"status": "saved"}
+
+@router.get("/session/draft")
+def get_wizard_draft(db: Session = Depends(get_db)):
+    state = db.query(SystemState).filter(SystemState.key == "wizard_draft").first()
+    if state and state.value:
+        try:
+            return json.loads(state.value)
+        except Exception:
+            return None
+    return None
+
+@router.delete("/session/draft")
+def clear_wizard_draft(db: Session = Depends(get_db)):
+    state = db.query(SystemState).filter(SystemState.key == "wizard_draft").first()
+    if state:
+        db.delete(state)
+        db.commit()
+    return {"status": "cleared"}
+
