@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Download, FileSpreadsheet, FileText, ChevronDown } from "lucide-react";
+import { Download, FileSpreadsheet, FileText, Calendar, ChevronDown } from "lucide-react";
 import { api } from "@/services/api";
 
 interface ExportMenuProps {
@@ -12,8 +12,12 @@ interface ExportMenuProps {
 export const ExportMenu: React.FC<ExportMenuProps> = ({ projectId }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleDownload = (type: "excel" | "word") => {
-    const url = type === "excel" ? api.getExportExcelUrl(projectId) : api.getExportWordUrl(projectId);
+  const handleDownload = (type: "excel" | "word" | "ics") => {
+    let url = "";
+    if (type === "excel") url = api.getExportExcelUrl(projectId);
+    else if (type === "word") url = api.getExportWordUrl(projectId);
+    else if (type === "ics") url = api.getExportIcsUrl(projectId);
+
     window.location.href = url;
     setIsOpen(false);
   };
@@ -60,6 +64,19 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ projectId }) => {
               <div>
                 <strong className="block font-semibold text-[#1f1f1f]">Word Report (.docx)</strong>
                 <span className="text-[11px] text-[#5f6368]">Báo cáo tổng kết dự án hoàn chỉnh</span>
+              </div>
+            </button>
+
+            <button
+              onClick={() => handleDownload("ics")}
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-xs text-left text-[#1f1f1f] hover:bg-[#fef7e0] transition-all"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#fef7e0] text-[#b06000] shrink-0 border border-[#feefc3]">
+                <Calendar className="h-4 w-4" />
+              </div>
+              <div>
+                <strong className="block font-semibold text-[#1f1f1f]">Lịch iCalendar (.ics)</strong>
+                <span className="text-[11px] text-[#5f6368]">Import vào Google Calendar & Apple/Outlook</span>
               </div>
             </button>
           </div>

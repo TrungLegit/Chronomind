@@ -82,6 +82,73 @@ export const api = {
     return `${API_BASE_URL}/projects/${id}/export/word`;
   },
 
+  getExportIcsUrl(id: string): string {
+    return `${API_BASE_URL}/projects/${id}/export/ics`;
+  },
+
+  // Google Calendar Integration APIs
+  async getGoogleStatus(): Promise<{
+    is_configured: boolean;
+    is_connected: boolean;
+    client_id_preview: string;
+    redirect_uri: string;
+    user_email?: string;
+    user_name?: string;
+    connected_at?: string;
+  }> {
+    const res = await fetch(`${API_BASE_URL}/integrations/google/status`, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to get Google status");
+    return res.json();
+  },
+
+  async saveGoogleConfig(data: { client_id: string; client_secret: string; redirect_uri?: string }): Promise<any> {
+    const res = await fetch(`${API_BASE_URL}/integrations/google/config`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || "Không thể lưu cấu hình Google OAuth");
+    }
+    return res.json();
+  },
+
+  async getGoogleAuthUrl(): Promise<{ auth_url: string }> {
+    const res = await fetch(`${API_BASE_URL}/integrations/google/auth-url`, { cache: "no-store" });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || "Không thể lấy link xác thực Google");
+    }
+    return res.json();
+  },
+
+  async syncProjectToGoogle(projectId: string): Promise<{
+    status: string;
+    calendar_id: string;
+    calendar_name: string;
+    synced_phases: number;
+    synced_milestones: number;
+    calendar_url: string;
+  }> {
+    const res = await fetch(`${API_BASE_URL}/integrations/google/sync/${projectId}`, {
+      method: "POST",
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || "Không thể đồng bộ lên Google Calendar");
+    }
+    return res.json();
+  },
+
+  async disconnectGoogle(): Promise<any> {
+    const res = await fetch(`${API_BASE_URL}/integrations/google/disconnect`, {
+      method: "POST",
+    });
+    if (!res.ok) throw new Error("Không thể ngắt kết nối Google");
+    return res.json();
+  },
+
   // Session & Local Persistence methods
   async getLastActiveProject(): Promise<{
     has_recent: boolean;

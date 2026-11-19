@@ -110,7 +110,18 @@ Backend FastAPI cung cấp đầy đủ các API chuẩn RESTful cho việc phâ
 * **Banner "Tiếp tục công việc trước đó":** Khi mở lại app, hệ thống tự động nhận diện dự án bạn thao tác gần nhất, hiển thị tiến độ và gợi ý ngay **việc tiếp theo cần làm**. Bấm 1 click là tiếp tục công việc ngay lập tức.
 * **Tự động lưu bản nháp (Draft Auto-Save):** Tự động ghi nhớ nội dung ý tưởng đang gõ dở vào LocalStorage & SQLite. Lỡ tắt tab hoặc F5 vẫn khôi phục nguyên vẹn 100%.
 
-### 5. 📑 Xuất Báo Cáo Chuyên Nghiệp (Excel & Word)
+### 5. 📅 Tích Hợp Google Calendar Linh Hoạt (Hybrid Calendar Integration)
+* **Tầng 1 (Tức thì / Zero-Config - Không cần cài đặt):**
+  * **Xuất file iCalendar (`.ics`):** Tạo file lịch chuẩn quốc tế RFC 5545 chứa toàn bộ Phase và Milestone. Nhấp đúp để import ngay vào Google Calendar, Apple Calendar, Outlook.
+  * **1-Click Web Template:** Mở ngay màn hình tạo sự kiện trên Google Calendar với tiêu đề, ngày giờ và mô tả công việc đã điền sẵn cho từng Phase.
+* **Tầng 2 (Nâng cao / Đồng bộ 2 chiều tự động qua Google Calendar API):**
+  * **Hướng dẫn trực quan từng bước:** Modal tích hợp hướng dẫn 5 bước chi tiết kèm đường dẫn trực tiếp đến Google Cloud Console và nút **Sao chép 1-Click Redirect URI**.
+  * **Trích xuất tự động từ file:** Cho phép dán trực tiếp toàn bộ nội dung file `credentials.json` để hệ thống tự động bóc tách Client ID và Client Secret.
+  * **Lịch dự án riêng biệt:** Tự động tạo và quản lý lịch riêng `Chronomind: [Tên dự án]` trên tài khoản Google của bạn.
+  * **Đồng bộ thông minh (Upsert theo Deterministic ID):** Khi bạn lùi deadline hoặc dời ngày trong Chronomind, bấm nút **"Đồng bộ ngay"** sẽ tự động dịch chuyển ngày giờ của các sự kiện tương ứng trên Google Calendar thay vì tạo sự kiện mới trùng lặp!
+  * **Tự động làm mới Token:** Quản lý `access_token` và tự động refresh token trong nền, không làm gián đoạn trải nghiệm người dùng.
+
+### 6. 📑 Xuất Báo Cáo Chuyên Nghiệp (Excel, Word & Lịch .ics)
 * **Xuất file Excel (`.xlsx` qua `openpyxl`):**
   - **Sheet 1 (Project Summary):** Thẻ KPI tổng quan, điểm số AI, bảng checklist chuẩn bị kèm trạng thái.
   - **Sheet 2 (WBS & Schedule):** Bảng Work Breakdown Structure chi tiết từng Phase/Task, gắn nhãn Milestone (★), cột ngày dự kiến, và tự động tô màu có điều kiện (Done: Xanh lá, Running: Xanh dương, Delayed: Đỏ nhạt).
@@ -131,11 +142,14 @@ graph TD
         BE --> Scheduler[Dynamic Deadline Scheduler]
         BE --> ExporterExcel[Excel Exporter<br/>openpyxl]
         BE --> ExporterWord[Word Exporter<br/>python-docx]
+        BE --> ExporterICS[iCalendar Exporter<br/>RFC 5545]
+        BE --> GoogleCal[Google Calendar Service<br/>OAuth2 + REST API]
     end
 
     AIEngine -->|Structured JSON Output| BE
     Scheduler -->|Tính toán tịnh tiến ngày| DB[(SQLite Local Database<br/>chronomind.db)]
-    BE -->|Trả về .xlsx & .docx| FE
+    BE -->|Trả về .xlsx, .docx & .ics| FE
+    GoogleCal -->|Đồng bộ 2 chiều sự kiện| GCalApi[Google Calendar Cloud API]
     FE -->|Biểu đồ Gantt & Báo cáo| User
 ```
 
@@ -211,10 +225,17 @@ graph TD
 | `POST` | `/api/prerequisites/{id}/toggle` | Đánh dấu hoàn thành hạng mục chuẩn bị |
 | `GET` | `/api/projects/{id}/export/excel` | Xuất bảng kế hoạch WBS ra `.xlsx` (kèm conditional color) |
 | `GET` | `/api/projects/{id}/export/word` | Xuất báo cáo trạng thái ra `.docx` chuyên nghiệp |
+| `GET` | `/api/projects/{id}/export/ics` | Xuất tệp lịch iCalendar `.ics` chuẩn RFC 5545 cho toàn bộ Phase/Milestone |
 | `GET` | `/api/projects/session/last-active`| Lấy dự án thao tác gần nhất & việc tiếp theo cần làm |
 | `POST` | `/api/projects/{id}/mark-active` | Cập nhật dự án đang kích hoạt trong phiên làm việc |
 | `POST` | `/api/projects/session/draft` | Lưu bản nháp ý tưởng tự động |
 | `GET` | `/api/projects/session/draft` | Lấy lại bản nháp ý tưởng đã lưu |
+| `GET` | `/api/integrations/google/status` | Kiểm tra trạng thái liên kết tài khoản Google Calendar |
+| `POST` | `/api/integrations/google/config` | Lưu Client ID & Secret từ Google Cloud Console |
+| `GET` | `/api/integrations/google/auth-url` | Sinh đường dẫn OAuth2 Consent Screen |
+| `GET` | `/api/integrations/google/callback` | Callback tiếp nhận authorization code và lưu token |
+| `POST` | `/api/integrations/google/sync/{id}`| Tự động tạo/cập nhật sự kiện Phase & Milestone lên Google Calendar |
+| `POST` | `/api/integrations/google/disconnect`| Hủy liên kết tài khoản Google Calendar |
 
 ---
 
@@ -227,7 +248,7 @@ graph TD
   - Cơ chế ghi nhớ cục bộ & khôi phục phiên (Session Persistence & Auto-Resume).
   - Giao diện Google Workspace / Gmail Theme trắng sáng thân thiện.
   - Xuất bảng WBS Excel & báo cáo Word có định dạng đẹp.
-- [ ] **v1.1:** Tích hợp đồng bộ 2 chiều với **Google Calendar** (Tự động tạo sự kiện cho từng Phase & Milestone).
+- [x] **v1.1:** Tích hợp **Hybrid Google Calendar** (Tự động đồng bộ 2 chiều qua Google Calendar API, xuất `.ics` và tạo 1-click URL template).
 - [ ] **v1.2:** Tích hợp **Telegram Bot & Discord Webhook** nhắc nhở deadline và cảnh báo trễ tiến độ hằng ngày.
 - [ ] **v1.3:** Kết nối trực tiếp với **GitHub Issues & Projects** (tự động tạo issue từ task WBS).
 

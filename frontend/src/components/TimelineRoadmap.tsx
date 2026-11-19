@@ -22,6 +22,7 @@ interface TimelineRoadmapProps {
   completionDate?: string;
   extensions: ExtensionLog[];
   onToggleTask: (taskId: string) => Promise<void>;
+  onOpenCalendar?: () => void;
 }
 
 export const TimelineRoadmap: React.FC<TimelineRoadmapProps> = ({
@@ -31,6 +32,7 @@ export const TimelineRoadmap: React.FC<TimelineRoadmapProps> = ({
   completionDate,
   extensions,
   onToggleTask,
+  onOpenCalendar,
 }) => {
   const [activeTab, setActiveTab] = useState<"gantt" | "wbs">("gantt");
   const [collapsedPhases, setCollapsedPhases] = useState<Record<string, boolean>>({});
@@ -108,6 +110,16 @@ export const TimelineRoadmap: React.FC<TimelineRoadmapProps> = ({
             <span>Danh sách công việc (Tasks)</span>
           </button>
         </div>
+
+        {onOpenCalendar && (
+          <button
+            onClick={onOpenCalendar}
+            className="flex items-center gap-1.5 rounded-full border border-[#dadce0] bg-white px-3.5 py-1.5 text-xs text-[#0b57d0] font-semibold hover:bg-[#eaf1fb] hover:border-[#c2e7ff] transition-all shadow-xs self-start sm:self-auto"
+          >
+            <Calendar className="h-3.5 w-3.5 text-[#0b57d0]" />
+            <span>Đồng bộ Google Calendar</span>
+          </button>
+        )}
       </div>
 
       {/* Render Active View */}

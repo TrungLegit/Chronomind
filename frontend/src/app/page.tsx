@@ -21,6 +21,7 @@ import { RescheduleModal } from "@/components/RescheduleModal";
 import { ExtensionHistoryDrawer } from "@/components/ExtensionHistoryDrawer";
 import { ExportMenu } from "@/components/ExportMenu";
 import { ResumeProjectBanner } from "@/components/ResumeProjectBanner";
+import { GoogleCalendarModal } from "@/components/GoogleCalendarModal";
 import { api } from "@/services/api";
 import { Project, ProjectSummary, ProjectCreateInput, ExtensionInput } from "@/types";
 
@@ -31,6 +32,7 @@ export default function Home() {
   const [isWizardOpen, setIsWizardOpen] = useState<boolean>(false);
   const [isRescheduleOpen, setIsRescheduleOpen] = useState<boolean>(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState<boolean>(false);
   const [recentSession, setRecentSession] = useState<{
     project: any;
     next_task: any;
@@ -278,7 +280,15 @@ export default function Home() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-2.5 shrink-0">
+              <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+                <button
+                  onClick={() => setIsCalendarOpen(true)}
+                  className="flex items-center gap-2 rounded-full border border-[#dadce0] bg-white px-4 py-2 text-xs font-semibold text-[#3c4043] hover:bg-[#eaf1fb] hover:border-[#c2e7ff] hover:text-[#0b57d0] shadow-xs transition-all"
+                >
+                  <Calendar className="h-4 w-4 text-[#0b57d0]" />
+                  <span>Google Calendar</span>
+                </button>
+
                 <ExportMenu projectId={currentProject.id} projectTitle={currentProject.title} />
 
                 <button
@@ -337,6 +347,7 @@ export default function Home() {
               completionDate={currentProject.estimated_completion_date}
               extensions={currentProject.extensions}
               onToggleTask={handleToggleTask}
+              onOpenCalendar={() => setIsCalendarOpen(true)}
             />
           </div>
         )}
@@ -351,6 +362,12 @@ export default function Home() {
 
       {currentProject && (
         <>
+          <GoogleCalendarModal
+            isOpen={isCalendarOpen}
+            project={currentProject}
+            onClose={() => setIsCalendarOpen(false)}
+          />
+
           <RescheduleModal
             isOpen={isRescheduleOpen}
             phases={currentProject.phases}
