@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { Phase, ExtensionLog } from "@/types";
-import { Calendar, ChevronLeft, ChevronRight, Clock, Star, AlertCircle } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, Star, Clock } from "lucide-react";
 
 interface GanttChartProps {
   phases: Phase[];
@@ -19,7 +19,7 @@ export const GanttChart: React.FC<GanttChartProps> = ({
 }) => {
   const [viewMode, setViewMode] = useState<"days" | "weeks">("days");
 
-  // Determine global timeline boundaries
+  // Determine timeline boundaries
   const { startDate, endDate, totalDays, datesList } = useMemo(() => {
     let minT = kickoffDate ? new Date(kickoffDate).getTime() : Date.now();
     let maxT = completionDate ? new Date(completionDate).getTime() : minT + 30 * 86400000;
@@ -35,11 +35,10 @@ export const GanttChart: React.FC<GanttChartProps> = ({
       }
     });
 
-    // Add 2 days buffer before and 5 days after
     const start = new Date(minT - 2 * 86400000);
     start.setHours(0, 0, 0, 0);
 
-    const end = new Date(maxT + 5 * 86400000);
+    const end = new Date(maxT + 4 * 86400000);
     end.setHours(23, 59, 59, 999);
 
     const diffDays = Math.max(Math.ceil((end.getTime() - start.getTime()) / 86400000), 14);
@@ -52,11 +51,9 @@ export const GanttChart: React.FC<GanttChartProps> = ({
     return { startDate: start, endDate: end, totalDays: diffDays, datesList: list };
   }, [phases, kickoffDate, completionDate]);
 
-  // Pixel calculation
-  const dayColWidth = viewMode === "days" ? 38 : 18;
+  const dayColWidth = viewMode === "days" ? 42 : 22;
   const chartWidth = totalDays * dayColWidth;
 
-  // Calculate position of a date
   const getX = (dateStr?: string) => {
     if (!dateStr) return 0;
     const t = new Date(dateStr).getTime();
@@ -71,50 +68,54 @@ export const GanttChart: React.FC<GanttChartProps> = ({
   }, [startDate, totalDays, dayColWidth]);
 
   return (
-    <div className="rounded-lg border border-white/[0.08] bg-[#0d111a] overflow-hidden">
-      {/* Gantt Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 border-b border-white/[0.06] bg-[#0a0e17]">
-        <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-blue-400" />
-          <span className="font-mono text-xs font-semibold text-slate-200">
-            TIMELINE GANTT (DYNAMIC SCHEDULE)
-          </span>
-          <span className="text-[11px] text-slate-500 font-mono">
-            {totalDays} ngày tổng thể
-          </span>
+    <div className="rounded-2xl border border-[#e5e7eb] bg-white overflow-hidden shadow-xs">
+      {/* Calendar Header Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-b border-[#f1f3f4] bg-[#f8fafd]">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#eaf1fb] text-[#0b57d0]">
+            <Calendar className="h-4 w-4" />
+          </div>
+          <div>
+            <h4 className="text-xs font-bold text-[#1f1f1f]">
+              LỊCH BIỂU TIẾN ĐỘ (GOOGLE CALENDAR VIEW)
+            </h4>
+            <span className="text-[11px] text-[#5f6368]">
+              Tổng thời lượng: {totalDays} ngày
+            </span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           {/* Legend */}
-          <div className="hidden sm:flex items-center gap-3 text-[11px] font-mono text-slate-400">
+          <div className="hidden sm:flex items-center gap-3 text-xs text-[#5f6368]">
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-sm bg-blue-500/80" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[#1a73e8]" />
               <span>Kế hoạch</span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-sm bg-emerald-500" />
-              <span>Hoàn thành</span>
+              <span className="h-2.5 w-2.5 rounded-full bg-[#137333]" />
+              <span>Hoàn tất</span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-sm bg-amber-500/80 border border-amber-400/50" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[#fbbc04]" />
               <span>Gia hạn (+days)</span>
             </span>
           </div>
 
           {/* View mode toggle */}
-          <div className="flex rounded-md border border-white/[0.08] bg-[#121824] p-0.5 font-mono text-[11px]">
+          <div className="flex rounded-full border border-[#dadce0] bg-white p-0.5 text-xs font-medium">
             <button
               onClick={() => setViewMode("days")}
-              className={`rounded px-2 py-0.5 transition-colors ${
-                viewMode === "days" ? "bg-white/[0.1] text-white" : "text-slate-400 hover:text-slate-200"
+              className={`rounded-full px-3 py-1 transition-all ${
+                viewMode === "days" ? "bg-[#c2e7ff] text-[#001d35] font-semibold" : "text-[#5f6368] hover:text-[#1f1f1f]"
               }`}
             >
-              Ngày
+              Theo ngày
             </button>
             <button
               onClick={() => setViewMode("weeks")}
-              className={`rounded px-2 py-0.5 transition-colors ${
-                viewMode === "weeks" ? "bg-white/[0.1] text-white" : "text-slate-400 hover:text-slate-200"
+              className={`rounded-full px-3 py-1 transition-all ${
+                viewMode === "weeks" ? "bg-[#c2e7ff] text-[#001d35] font-semibold" : "text-[#5f6368] hover:text-[#1f1f1f]"
               }`}
             >
               Thu nhỏ
@@ -125,13 +126,13 @@ export const GanttChart: React.FC<GanttChartProps> = ({
 
       {/* Main Gantt Body */}
       <div className="overflow-x-auto">
-        <div style={{ minWidth: chartWidth + 240 }} className="relative select-none">
-          {/* Timeline Header Row */}
-          <div className="flex border-b border-white/[0.06] bg-[#0a0e17]/80 text-[10px] font-mono text-slate-400">
-            <div className="w-60 shrink-0 px-3 py-2 border-r border-white/[0.06] font-semibold text-slate-300">
-              Giai đoạn & Mốc (Phase)
+        <div style={{ minWidth: chartWidth + 260 }} className="relative select-none">
+          {/* Timeline Days Header */}
+          <div className="flex border-b border-[#e5e7eb] bg-[#f8fafd] text-xs font-medium text-[#5f6368]">
+            <div className="w-64 shrink-0 px-4 py-2.5 border-r border-[#e5e7eb] font-semibold text-[#1f1f1f]">
+              Giai đoạn thực hiện (Phase)
             </div>
-            <div className="flex-1 flex relative h-9">
+            <div className="flex-1 flex relative h-10">
               {datesList.map((d, idx) => {
                 const isFirstOfMonth = d.getDate() === 1 || idx === 0;
                 const isWeekend = d.getDay() === 0 || d.getDay() === 6;
@@ -139,29 +140,29 @@ export const GanttChart: React.FC<GanttChartProps> = ({
                   <div
                     key={idx}
                     style={{ width: dayColWidth }}
-                    className={`shrink-0 border-r border-white/[0.03] text-center flex flex-col justify-center ${
-                      isWeekend ? "bg-white/[0.015]" : ""
+                    className={`shrink-0 border-r border-[#f1f3f4] text-center flex flex-col justify-center ${
+                      isWeekend ? "bg-[#f1f3f4]/50" : ""
                     }`}
                   >
                     {isFirstOfMonth && (
-                      <span className="text-[9px] font-bold text-blue-400 block -mt-1 leading-none">
+                      <span className="text-[9px] font-bold text-[#1a73e8] block leading-none">
                         T{d.getMonth() + 1}
                       </span>
                     )}
-                    <span className={`text-[10px] ${isWeekend ? "text-slate-500" : "text-slate-300"}`}>
+                    <span className={`text-[11px] font-medium ${isWeekend ? "text-[#80868b]" : "text-[#1f1f1f]"}`}>
                       {d.getDate()}
                     </span>
                   </div>
                 );
               })}
 
-              {/* Today line marker in header */}
+              {/* Today line marker */}
               {todayX !== null && (
                 <div
                   style={{ left: todayX }}
-                  className="absolute top-0 bottom-0 w-px bg-rose-500 z-20 pointer-events-none"
+                  className="absolute top-0 bottom-0 w-0.5 bg-[#ea4335] z-20 pointer-events-none"
                 >
-                  <span className="absolute -top-1 -left-4 rounded bg-rose-500 text-[8px] font-bold text-white px-1 leading-tight">
+                  <span className="absolute -top-1 -left-5 rounded-full bg-[#ea4335] text-[9px] font-bold text-white px-1.5 py-0.2 shadow-xs leading-tight">
                     Hôm nay
                   </span>
                 </div>
@@ -180,111 +181,113 @@ export const GanttChart: React.FC<GanttChartProps> = ({
             const completedTasks = phase.tasks.filter((t) => t.status === "DONE").length;
             const progressPct = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
-            // Check if this phase had extensions logged
             const phaseExtensions = extensions.filter((e) => e.phase_id === phase.id);
             const totalExtendedDays = phaseExtensions.reduce((acc, e) => acc + e.days_added, 0);
 
             return (
               <div
                 key={phase.id}
-                className="flex border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors group h-12 items-center"
+                className="flex border-b border-[#f1f3f4] hover:bg-[#f8fafd] transition-colors h-14 items-center group"
               >
-                {/* Left label column */}
-                <div className="w-60 shrink-0 px-3 py-1.5 border-r border-white/[0.06] flex items-center justify-between">
+                {/* Left Phase Column */}
+                <div className="w-64 shrink-0 px-4 py-2 border-r border-[#e5e7eb] flex items-center justify-between">
                   <div className="min-w-0 pr-2">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-mono text-[10px] font-semibold text-blue-400">
-                        P{phase.phase_number}
+                      <span className="text-xs font-bold text-[#0b57d0]">
+                        Phase {phase.phase_number}
                       </span>
-                      <span className="text-xs font-medium text-slate-200 truncate block">
+                      <span className="text-xs font-medium text-[#1f1f1f] truncate block">
                         {phase.title}
                       </span>
                     </div>
-                    <span className="font-mono text-[10px] text-slate-500">
-                      {completedTasks}/{totalTasks} tasks • {phase.estimated_hours}h
+                    <span className="text-[11px] text-[#5f6368]">
+                      {completedTasks}/{totalTasks} việc • {phase.estimated_hours}h
                     </span>
                   </div>
 
                   <span
-                    className={`font-mono text-[9px] px-1.5 py-0.5 rounded border shrink-0 ${
+                    className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 border ${
                       phase.status === "COMPLETED"
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                        ? "bg-[#e6f4ea] text-[#137333] border-[#ceead6]"
                         : phase.status === "IN_PROGRESS"
-                        ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                        : "bg-slate-800 text-slate-400 border-slate-700"
+                        ? "bg-[#e8f0fe] text-[#1a73e8] border-[#c2e7ff]"
+                        : "bg-[#f1f3f4] text-[#5f6368] border-[#dadce0]"
                     }`}
                   >
-                    {phase.status === "IN_PROGRESS" ? "RUNNING" : phase.status}
+                    {phase.status === "IN_PROGRESS" ? "ĐANG LÀM" : phase.status === "COMPLETED" ? "XONG" : "CHỜ"}
                   </span>
                 </div>
 
-                {/* Right timeline bars column */}
+                {/* Right Calendar Event Bars */}
                 <div className="flex-1 relative h-full flex items-center">
-                  {/* Grid background vertical lines */}
+                  {/* Grid Lines */}
                   <div className="absolute inset-0 flex pointer-events-none">
                     {datesList.map((d, idx) => (
                       <div
                         key={idx}
                         style={{ width: dayColWidth }}
-                        className={`shrink-0 border-r border-white/[0.02] h-full ${
-                          d.getDay() === 0 || d.getDay() === 6 ? "bg-white/[0.01]" : ""
+                        className={`shrink-0 border-r border-[#f1f3f4] h-full ${
+                          d.getDay() === 0 || d.getDay() === 6 ? "bg-[#f1f3f4]/20" : ""
                         }`}
                       />
                     ))}
                   </div>
 
-                  {/* Today vertical line */}
                   {todayX !== null && (
                     <div
                       style={{ left: todayX }}
-                      className="absolute top-0 bottom-0 w-px bg-rose-500/70 z-10 pointer-events-none"
+                      className="absolute top-0 bottom-0 w-0.5 bg-[#ea4335]/70 z-10 pointer-events-none"
                     />
                   )}
 
-                  {/* The Gantt Bar */}
+                  {/* Google Calendar Event Bar */}
                   {hasDates ? (
                     <div
                       style={{ left: startX, width: barWidth }}
-                      className="absolute h-6 rounded border border-white/[0.1] bg-[#1a2333] overflow-hidden flex items-center transition-all group-hover:border-blue-500/50 shadow-xs"
+                      className={`absolute h-7 rounded-xl border flex items-center px-2.5 transition-all shadow-xs group-hover:shadow-sm ${
+                        phase.status === "COMPLETED"
+                          ? "bg-[#e6f4ea] border-[#ceead6] text-[#137333]"
+                          : "bg-[#c2e7ff] border-[#7fcfff] text-[#001d35]"
+                      }`}
                     >
-                      {/* Completed progress fill */}
+                      {/* Completed progress fill bar */}
                       <div
                         style={{ width: `${progressPct}%` }}
-                        className={`h-full transition-all duration-300 ${
-                          phase.status === "COMPLETED" ? "bg-emerald-500/80" : "bg-blue-600/80"
+                        className={`absolute left-0 top-0 bottom-0 rounded-l-xl opacity-30 ${
+                          phase.status === "COMPLETED" ? "bg-[#137333]" : "bg-[#0b57d0]"
                         }`}
                       />
 
-                      {/* Extended days stripe pattern if rescheduled */}
+                      {/* Extended days highlight */}
                       {totalExtendedDays > 0 && (
                         <div
                           style={{ width: totalExtendedDays * dayColWidth }}
-                          title={`Giai đoạn đã gia hạn thêm ${totalExtendedDays} ngày`}
-                          className="absolute right-0 top-0 bottom-0 bg-amber-500/20 border-l border-amber-400/50"
+                          title={`Giai đoạn này đã gia hạn thêm ${totalExtendedDays} ngày`}
+                          className="absolute right-0 top-0 bottom-0 bg-[#fef7e0] border-l border-[#fbbc04] rounded-r-xl"
                         />
                       )}
 
-                      {/* Label on bar */}
-                      <span className="absolute left-2 text-[10px] font-mono text-white/90 whitespace-nowrap pointer-events-none font-medium truncate pr-2">
+                      {/* Bar Content */}
+                      <span className="relative z-10 text-xs font-semibold truncate pr-2">
                         {phase.title} ({Math.round(progressPct)}%)
                       </span>
 
-                      {/* Milestone diamonds */}
+                      {/* Milestone Stars */}
                       {phase.tasks
                         .filter((t) => t.is_milestone)
                         .map((m, mIdx) => (
                           <div
                             key={m.id || mIdx}
-                            title={`Milestone: ${m.title}`}
-                            className="absolute -right-1 top-1/2 -translate-y-1/2 text-amber-400 z-10"
+                            title={`Cột mốc: ${m.title}`}
+                            className="absolute -right-2 top-1/2 -translate-y-1/2 text-[#fbbc04] z-10 bg-white rounded-full p-0.5 shadow-xs"
                           >
-                            <Star className="h-3 w-3 fill-amber-400" />
+                            <Star className="h-3.5 w-3.5 fill-[#fbbc04]" />
                           </div>
                         ))}
                     </div>
                   ) : (
-                    <div className="px-4 text-[11px] font-mono text-slate-500 italic">
-                      Lịch trình sẽ được ấn định sau khi bấm Kick-off
+                    <div className="px-5 text-xs text-[#5f6368] italic">
+                      Lịch trình sẽ xuất hiện sau khi bấm Bắt đầu (Kick-off)
                     </div>
                   )}
                 </div>

@@ -1,20 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const inter = Inter({
+  subsets: ["latin", "vietnamese"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "Chronomind - AI Dynamic Project & Deadline Planner",
-  description: "AI-Powered Dynamic Project & Deadline Planner with Feasibility Analyzer, Smart Trigger and Automated Reports",
+  description: "Trình quản lý dự án & lập lịch thông minh tích hợp AI thân thiện như Google Workspace",
 };
 
 export default function RootLayout({
@@ -23,8 +18,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className="dark">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-slate-950 text-slate-100`}>
+    <html lang="vi">
+      <body className={`${inter.className} min-h-screen bg-[#f8fafd] text-[#1f1f1f] antialiased`}>
         {children}
       </body>
     </html>

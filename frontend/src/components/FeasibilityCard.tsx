@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { AlertTriangle, ShieldCheck, Zap, Info, Clock, Activity, Cpu } from "lucide-react";
+import { AlertTriangle, Sparkles, Clock, Zap, BookOpen } from "lucide-react";
 
 interface FeasibilityCardProps {
   score: number;
@@ -20,121 +20,126 @@ export const FeasibilityCard: React.FC<FeasibilityCardProps> = ({
   hoursPerWeek,
   skillLevel,
 }) => {
-  const getScoreBadge = (val: number) => {
+  const getScoreTheme = (val: number) => {
     if (val <= 4.0)
       return {
-        tag: "LOW COMPLEXITY",
-        bg: "bg-emerald-500/10",
-        border: "border-emerald-500/20",
-        text: "text-emerald-400",
+        label: "Độ khó thấp • Rất khả thi",
+        bg: "bg-[#e6f4ea]",
+        text: "text-[#137333]",
+        border: "border-[#ceead6]",
       };
     if (val <= 7.0)
       return {
-        tag: "MODERATE DIFFICULTY",
-        bg: "bg-amber-500/10",
-        border: "border-amber-500/20",
-        text: "text-amber-400",
+        label: "Độ khó trung bình • Cần tập trung",
+        bg: "bg-[#fef7e0]",
+        text: "text-[#b06000]",
+        border: "border-[#feefc3]",
       };
     return {
-      tag: "HIGH R&D EFFORT",
-      bg: "bg-rose-500/10",
-      border: "border-rose-500/20",
-      text: "text-rose-400",
+      label: "Độ khó cao • R&D / Thử thách",
+      bg: "bg-[#fce8e6]",
+      text: "text-[#c5221f]",
+      border: "border-[#fad2cf]",
     };
   };
 
-  const badge = getScoreBadge(score);
+  const theme = getScoreTheme(score);
 
   return (
     <div className="space-y-4">
-      {/* Tremor-inspired Metric KPI Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {/* KPI 1: AI Complexity */}
-        <div className="rounded-lg border border-white/[0.08] bg-[#0d111a] p-3.5">
-          <div className="flex items-center justify-between mb-1">
-            <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-              Độ khó kỹ thuật
+      {/* 4 Clean Metric Cards (Google Workspace Style) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+        {/* KPI 1 */}
+        <div className="rounded-2xl border border-[#e5e7eb] bg-white p-4 shadow-xs">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs font-medium text-[#5f6368]">
+              Đánh giá độ khó AI
             </span>
-            <span className={`font-mono text-[9px] px-1 py-0.5 rounded border ${badge.border} ${badge.bg} ${badge.text}`}>
-              {badge.tag}
+            <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${theme.bg} ${theme.text} ${theme.border}`}>
+              {score <= 4.0 ? "DỄ" : score <= 7.0 ? "VỪA" : "KHÓ"}
             </span>
           </div>
           <div className="flex items-baseline gap-1 mt-1">
-            <span className={`font-mono text-2xl font-bold tracking-tight tabular-nums ${badge.text}`}>
+            <span className={`text-2xl font-bold tracking-tight ${theme.text}`}>
               {score.toFixed(1)}
             </span>
-            <span className="font-mono text-xs text-slate-500">/ 10.0</span>
+            <span className="text-xs text-[#5f6368]">/ 10</span>
           </div>
         </div>
 
-        {/* KPI 2: Total Effort */}
-        <div className="rounded-lg border border-white/[0.08] bg-[#0d111a] p-3.5">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
-            Khối lượng ước tính
+        {/* KPI 2 */}
+        <div className="rounded-2xl border border-[#e5e7eb] bg-white p-4 shadow-xs">
+          <span className="text-xs font-medium text-[#5f6368] block mb-1.5">
+            Khối lượng dự án
           </span>
           <div className="flex items-baseline gap-1 mt-1">
-            <span className="font-mono text-2xl font-bold tracking-tight text-slate-100 tabular-nums">
+            <span className="text-2xl font-bold tracking-tight text-[#1f1f1f]">
               {totalHours}
             </span>
-            <span className="font-mono text-xs text-slate-500">giờ làm việc</span>
+            <span className="text-xs text-[#5f6368]">giờ làm việc</span>
           </div>
         </div>
 
-        {/* KPI 3: User Weekly Velocity */}
-        <div className="rounded-lg border border-white/[0.08] bg-[#0d111a] p-3.5">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
-            Năng lực hàng tuần
+        {/* KPI 3 */}
+        <div className="rounded-2xl border border-[#e5e7eb] bg-white p-4 shadow-xs">
+          <span className="text-xs font-medium text-[#5f6368] block mb-1.5">
+            Thời gian rảnh của bạn
           </span>
           <div className="flex items-baseline gap-1 mt-1">
-            <span className="font-mono text-2xl font-bold tracking-tight text-slate-100 tabular-nums">
+            <span className="text-2xl font-bold tracking-tight text-[#1f1f1f]">
               {hoursPerWeek}h
             </span>
-            <span className="font-mono text-xs text-slate-500">/ tuần • {skillLevel}</span>
+            <span className="text-xs text-[#5f6368]">/ tuần ({skillLevel})</span>
           </div>
         </div>
 
-        {/* KPI 4: Blind spots count */}
-        <div className="rounded-lg border border-white/[0.08] bg-[#0d111a] p-3.5">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">
+        {/* KPI 4 */}
+        <div className="rounded-2xl border border-[#e5e7eb] bg-white p-4 shadow-xs">
+          <span className="text-xs font-medium text-[#5f6368] block mb-1.5">
             Điểm mù phát hiện
           </span>
           <div className="flex items-baseline gap-1 mt-1">
-            <span className="font-mono text-2xl font-bold tracking-tight text-amber-400 tabular-nums">
+            <span className="text-2xl font-bold tracking-tight text-[#b06000]">
               {blindSpots.length}
             </span>
-            <span className="font-mono text-xs text-slate-500">rủi ro tiềm ẩn</span>
+            <span className="text-xs text-[#5f6368]">rủi ro cần chú ý</span>
           </div>
         </div>
       </div>
 
-      {/* Technical Assessment & Blind spots breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
-        {/* Left: AI Assessment (8 cols) */}
-        <div className="lg:col-span-7 rounded-lg border border-white/[0.08] bg-[#0d111a] p-4">
-          <div className="flex items-center gap-2 mb-2 pb-2 border-b border-white/[0.04]">
-            <Cpu className="h-4 w-4 text-blue-400" />
-            <h4 className="font-mono text-xs font-semibold uppercase tracking-wider text-slate-200">
-              Nhận định kiến trúc & Khả thi
-            </h4>
+      {/* Detail Breakdown: AI Advice & Blind Spots */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Left: Gemini AI Assistant Assessment */}
+        <div className="lg:col-span-7 rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-xs">
+          <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[#f1f3f4]">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#eaf1fb] text-[#0b57d0]">
+              <Sparkles className="h-4 w-4" />
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-[#1f1f1f]">
+                Nhận định từ AI Project Manager
+              </h4>
+              <span className={`text-xs font-medium ${theme.text}`}>{theme.label}</span>
+            </div>
           </div>
-          <p className="text-xs leading-relaxed text-slate-300">
+          <p className="text-xs sm:text-sm leading-relaxed text-[#444746]">
             {explanation || "Chưa có nhận định chi tiết."}
           </p>
         </div>
 
-        {/* Right: Blind spots warning (5 cols) */}
-        <div className="lg:col-span-5 rounded-lg border border-amber-500/20 bg-amber-500/[0.03] p-4">
-          <div className="flex items-center gap-2 mb-2 pb-2 border-b border-amber-500/10 text-amber-400">
-            <AlertTriangle className="h-4 w-4" />
-            <h4 className="font-mono text-xs font-semibold uppercase tracking-wider">
-              Điểm mù kỹ thuật (Blind Spots)
+        {/* Right: Blind Spots Callout */}
+        <div className="lg:col-span-5 rounded-2xl border border-[#feefc3] bg-[#fef7e0]/60 p-5 shadow-xs">
+          <div className="flex items-center gap-2 mb-3 pb-2 border-b border-[#feefc3] text-[#b06000]">
+            <AlertTriangle className="h-4 w-4 shrink-0" />
+            <h4 className="text-sm font-bold">
+              Điểm mù cần lưu ý (Blind Spots)
             </h4>
           </div>
 
           <ul className="space-y-2">
             {blindSpots.map((item, idx) => (
-              <li key={idx} className="flex items-start gap-2 text-xs text-slate-300 leading-normal">
-                <span className="mt-1 h-1 w-1 rounded-full bg-amber-400 shrink-0" />
+              <li key={idx} className="flex items-start gap-2 text-xs text-[#593d00] leading-relaxed">
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#b06000] shrink-0" />
                 <span>{item}</span>
               </li>
             ))}

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, Clock, Zap, Wrench, Loader2, Terminal, ArrowRight } from "lucide-react";
+import { X, Clock, Zap, Wrench, Loader2, Sparkles, ArrowRight } from "lucide-react";
 import { ProjectCreateInput } from "@/types";
 
 interface ProjectWizardModalProps {
@@ -54,11 +54,11 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
   if (!isOpen) return null;
 
   const loadingSteps = [
-    "Khởi tạo AI Project Engine & phân tích ngữ cảnh ý tưởng...",
-    "Tính toán độ khó kiến trúc & đối chiếu năng lực người dùng...",
+    "Khởi tạo AI Project Manager & đọc hiểu ý tưởng của bạn...",
+    "Tính toán độ khó kiến trúc & đối chiếu quỹ thời gian...",
     "Rà soát các điểm mù kỹ thuật (phần cứng, bug, bảo mật, API)...",
     "Thiết lập Checklist Chuẩn Bị (Prerequisites) tiền dự án...",
-    "Phân rã giai đoạn WBS & gán Milestone theo mô hình BabyAGI...",
+    "Phân rã giai đoạn WBS & thiết lập lịch trình động...",
   ];
 
   const handleApplyTemplate = (tpl: typeof TEMPLATES[0]) => {
@@ -101,45 +101,45 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-xs">
-      <div className="relative w-full max-w-xl rounded-lg border border-white/[0.1] bg-[#0d111a] p-5 shadow-xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
+      <div className="relative w-full max-w-xl rounded-3xl border border-[#e5e7eb] bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
           disabled={loading}
-          className="absolute right-3.5 top-3.5 rounded p-1 text-slate-400 hover:bg-white/[0.06] hover:text-white"
+          className="absolute right-4 top-4 rounded-full p-2 text-[#5f6368] hover:bg-[#f1f3f4] hover:text-[#1f1f1f] transition-colors"
         >
-          <X className="h-4 w-4" />
+          <X className="h-5 w-5" />
         </button>
 
         {loading ? (
-          <div className="py-10 text-center space-y-4">
-            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-md border border-blue-500/30 bg-blue-500/10 text-blue-400">
-              <Loader2 className="h-5 w-5 animate-spin" />
+          <div className="py-12 text-center space-y-4">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#eaf1fb] text-[#0b57d0]">
+              <Loader2 className="h-7 w-7 animate-spin" />
             </div>
 
             <div>
-              <h3 className="font-mono text-sm font-semibold text-slate-100">
-                AI ENGINE ĐANG PHÂN RÃ DỰ ÁN...
+              <h3 className="text-base font-bold text-[#1f1f1f]">
+                AI ĐANG PHÂN RÃ KẾ HOẠCH DỰ ÁN...
               </h3>
-              <p className="text-xs text-slate-400 mt-1">
-                BabyAGI-inspired task prioritization & dynamic phasing
+              <p className="text-xs text-[#5f6368] mt-1">
+                Tự động tối ưu hóa lộ trình dựa trên quỹ thời gian rảnh của bạn
               </p>
             </div>
 
-            <div className="mx-auto max-w-sm space-y-2 text-left pt-2">
+            <div className="mx-auto max-w-sm space-y-2.5 text-left pt-2">
               {loadingSteps.map((step, idx) => (
                 <div
                   key={idx}
-                  className={`flex items-center gap-2 font-mono text-[11px] transition-colors ${
+                  className={`flex items-center gap-2.5 text-xs transition-colors ${
                     idx === loadingStep
-                      ? "text-blue-400 font-medium"
+                      ? "text-[#0b57d0] font-semibold"
                       : idx < loadingStep
-                      ? "text-emerald-400"
-                      : "text-slate-600"
+                      ? "text-[#137333]"
+                      : "text-[#80868b]"
                   }`}
                 >
-                  <span className="shrink-0">
-                    {idx < loadingStep ? "✓" : idx === loadingStep ? "›" : "·"}
+                  <span className="shrink-0 font-bold">
+                    {idx < loadingStep ? "✓" : idx === loadingStep ? "›" : "•"}
                   </span>
                   <span>{step}</span>
                 </div>
@@ -148,28 +148,28 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
           </div>
         ) : (
           <div>
-            <div className="mb-4 pb-3 border-b border-white/[0.06]">
-              <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-blue-400 font-semibold mb-1">
-                <Terminal className="h-3.5 w-3.5" /> AI FEASIBILITY & WBS BUILDER
+            <div className="mb-5 pb-3 border-b border-[#f1f3f4]">
+              <div className="flex items-center gap-1.5 text-xs font-bold text-[#0b57d0] mb-1">
+                <Sparkles className="h-4 w-4" /> AI FEASIBILITY & TIMELINE PLANNER
               </div>
-              <h2 className="text-lg font-bold text-slate-100">Khởi Tạo & Phân Rã Dự Án</h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Nhập ý tưởng sơ bộ. AI sẽ tính độ khó, rủi ro tiềm ẩn và chia nhỏ các giai đoạn.
+              <h2 className="text-xl font-bold text-[#1f1f1f]">Khởi Tạo Kế Hoạch Dự Án</h2>
+              <p className="text-xs text-[#5f6368] mt-0.5">
+                Nhập ý tưởng sơ bộ. AI sẽ tính độ khó, rủi ro tiềm ẩn và tự động chia nhỏ các giai đoạn.
               </p>
             </div>
 
             {/* Quick Templates */}
-            <div className="mb-4 rounded border border-white/[0.06] bg-[#090d16] p-2.5">
-              <span className="font-mono text-[10px] uppercase font-semibold text-slate-400 block mb-1.5">
-                Mẫu thử nghiệm nhanh:
+            <div className="mb-4 rounded-2xl border border-[#e5e7eb] bg-[#f8fafd] p-3">
+              <span className="text-xs font-semibold text-[#5f6368] block mb-2">
+                💡 Gợi ý mẫu nhanh (Bấm để điền):
               </span>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {TEMPLATES.map((t, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => handleApplyTemplate(t)}
-                    className="rounded border border-white/[0.08] bg-[#121824] px-2 py-1 font-mono text-[11px] text-slate-300 hover:border-blue-500/50 hover:text-white transition-colors"
+                    className="rounded-full border border-[#dadce0] bg-white px-3 py-1 text-xs font-medium text-[#3c4043] hover:border-[#0b57d0] hover:text-[#0b57d0] hover:bg-[#eaf1fb] transition-all"
                   >
                     {t.title}
                   </button>
@@ -177,10 +177,10 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3.5">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block font-mono text-[11px] font-semibold text-slate-300 mb-1">
-                  TÊN DỰ ÁN <span className="text-rose-400">*</span>
+                <label className="block text-xs font-bold text-[#1f1f1f] mb-1">
+                  Tên dự án <span className="text-[#ea4335]">*</span>
                 </label>
                 <input
                   type="text"
@@ -188,45 +188,45 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
                   placeholder="VD: Chronomind - AI Dynamic Project Planner"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="h-8.5 w-full rounded-md border border-white/[0.08] bg-[#121824] px-3 text-xs text-slate-100 placeholder:text-slate-500 shadow-xs focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/40"
+                  className="w-full h-10 rounded-xl border border-[#dadce0] bg-white px-3.5 text-sm text-[#1f1f1f] placeholder-[#80868b] focus:border-[#0b57d0] focus:outline-none focus:ring-2 focus:ring-[#0b57d0]/20 transition-all"
                 />
               </div>
 
               <div>
-                <label className="block font-mono text-[11px] font-semibold text-slate-300 mb-1">
-                  MÔ TẢ Ý TƯỞNG & PHẠM VI <span className="text-rose-400">*</span>
+                <label className="block text-xs font-bold text-[#1f1f1f] mb-1">
+                  Mô tả ý tưởng & phạm vi dự án <span className="text-[#ea4335]">*</span>
                 </label>
                 <textarea
                   required
                   rows={3}
-                  placeholder="Mô tả những gì bạn muốn làm, công nghệ dự kiến, hoặc ý tưởng sơ bộ..."
+                  placeholder="Mô tả những gì bạn muốn làm, công nghệ dự kiến, hoặc ý tưởng sơ khai..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full rounded-md border border-white/[0.08] bg-[#121824] p-3 text-xs text-slate-100 placeholder:text-slate-500 shadow-xs focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/40"
+                  className="w-full rounded-xl border border-[#dadce0] bg-white p-3.5 text-sm text-[#1f1f1f] placeholder-[#80868b] focus:border-[#0b57d0] focus:outline-none focus:ring-2 focus:ring-[#0b57d0]/20 transition-all"
                 />
               </div>
 
               <div>
-                <label className="block font-mono text-[11px] font-semibold text-slate-300 mb-1">
-                  MỤC TIÊU ĐẦU RA (DEFINITION OF DONE)
+                <label className="block text-xs font-bold text-[#1f1f1f] mb-1">
+                  Mục tiêu đầu ra cụ thể (Definition of Done)
                 </label>
                 <input
                   type="text"
-                  placeholder="VD: Mạch hoạt động ổn định 30 ngày dùng pin hoặc Web MVP có 3 tính năng"
+                  placeholder="VD: Mạch chạy ổn định 30 ngày dùng pin hoặc Web app MVP có 3 tính năng chính"
                   value={targetGoal}
                   onChange={(e) => setTargetGoal(e.target.value)}
-                  className="h-8.5 w-full rounded-md border border-white/[0.08] bg-[#121824] px-3 text-xs text-slate-100 placeholder:text-slate-500 shadow-xs focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/40"
+                  className="w-full h-10 rounded-xl border border-[#dadce0] bg-white px-3.5 text-sm text-[#1f1f1f] placeholder-[#80868b] focus:border-[#0b57d0] focus:outline-none focus:ring-2 focus:ring-[#0b57d0]/20 transition-all"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <div className="flex justify-between items-center mb-1">
-                    <label className="font-mono text-[11px] font-semibold text-slate-300">
-                      QUỸ THỜI GIAN RẢNH
+                    <label className="text-xs font-bold text-[#1f1f1f]">
+                      Quỹ thời gian rảnh
                     </label>
-                    <span className="font-mono text-[11px] font-bold text-blue-400 tabular-nums">
-                      {hoursPerWeek}h / tuần
+                    <span className="text-xs font-bold text-[#0b57d0] bg-[#eaf1fb] px-2.5 py-0.5 rounded-full">
+                      {hoursPerWeek} giờ / tuần
                     </span>
                   </div>
                   <input
@@ -236,58 +236,58 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
                     step={1}
                     value={hoursPerWeek}
                     onChange={(e) => setHoursPerWeek(Number(e.target.value))}
-                    className="w-full accent-blue-500 cursor-pointer"
+                    className="w-full accent-[#0b57d0] cursor-pointer"
                   />
-                  <div className="flex justify-between font-mono text-[9px] text-slate-500">
+                  <div className="flex justify-between text-[10px] text-[#5f6368]">
                     <span>Part-time (5h)</span>
-                    <span>Nghiêm túc (15h)</span>
+                    <span>Tập trung (15h)</span>
                     <span>Full-time (40h)</span>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-mono text-[11px] font-semibold text-slate-300 mb-1">
-                    TRÌNH ĐỘ KỸ THUẬT
+                  <label className="block text-xs font-bold text-[#1f1f1f] mb-1">
+                    Trình độ hiện tại
                   </label>
                   <select
                     value={skillLevel}
                     onChange={(e) => setSkillLevel(e.target.value)}
-                    className="h-8.5 w-full rounded-md border border-white/[0.08] bg-[#121824] px-2.5 text-xs text-slate-100 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/40"
+                    className="w-full h-10 rounded-xl border border-[#dadce0] bg-white px-3 text-sm text-[#1f1f1f] focus:border-[#0b57d0] focus:outline-none focus:ring-2 focus:ring-[#0b57d0]/20 transition-all"
                   >
                     <option value="Beginner">Người mới bắt đầu (Beginner)</option>
                     <option value="Intermediate">Có kinh nghiệm cơ bản (Intermediate)</option>
-                    <option value="Advanced">Thành thạo / Chuyên gia (Advanced)</option>
+                    <option value="Advanced">Thành thạo / Chuyên nghiệp (Advanced)</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block font-mono text-[11px] font-semibold text-slate-300 mb-1">
-                  CÔNG CỤ & TÀI NGUYÊN HIỆN CÓ
+                <label className="block text-xs font-bold text-[#1f1f1f] mb-1">
+                  Công cụ & Thiết bị hiện có
                 </label>
                 <input
                   type="text"
-                  placeholder="VD: Laptop Linux, mỏ hàn, tài khoản Vercel..."
+                  placeholder="VD: Laptop Mac M1, tài khoản Vercel, mỏ hàn chì..."
                   value={toolsResources}
                   onChange={(e) => setToolsResources(e.target.value)}
-                  className="h-8.5 w-full rounded-md border border-white/[0.08] bg-[#121824] px-3 text-xs text-slate-100 placeholder:text-slate-500 shadow-xs focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500/40"
+                  className="w-full h-10 rounded-xl border border-[#dadce0] bg-white px-3.5 text-sm text-[#1f1f1f] placeholder-[#80868b] focus:border-[#0b57d0] focus:outline-none focus:ring-2 focus:ring-[#0b57d0]/20 transition-all"
                 />
               </div>
 
-              <div className="pt-3 flex items-center justify-end gap-2 border-t border-white/[0.06]">
+              <div className="pt-3 flex items-center justify-end gap-3 border-t border-[#f1f3f4]">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="h-8 rounded-md px-3 text-xs font-mono text-slate-400 hover:bg-white/[0.06] hover:text-white transition-colors"
+                  className="rounded-full px-4 py-2 text-xs font-semibold text-[#5f6368] hover:bg-[#f1f3f4] transition-colors"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="inline-flex h-8 items-center gap-1.5 rounded-md bg-blue-600 px-3.5 text-xs font-medium text-white shadow-xs hover:bg-blue-500 transition-colors"
+                  className="flex items-center gap-2 rounded-full bg-[#0b57d0] hover:bg-[#0842a0] px-5 py-2.5 text-xs font-semibold text-white shadow-xs hover:shadow-md transition-all"
                 >
                   <span>Phân tích & Lập Kế Hoạch AI</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
+                  <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
             </form>

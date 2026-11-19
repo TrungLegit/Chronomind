@@ -4,13 +4,13 @@ import React, { useState, useEffect } from "react";
 import {
   Plus,
   Trash2,
-  Terminal,
   Calendar,
   Layers,
   TrendingUp,
   Activity,
   ArrowRight,
   Loader2,
+  Sparkles,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { ProjectWizardModal } from "@/components/ProjectWizardModal";
@@ -31,7 +31,6 @@ export default function Home() {
   const [isRescheduleOpen, setIsRescheduleOpen] = useState<boolean>(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false);
 
-  // Load project list
   const loadProjects = async (selectId?: string) => {
     try {
       const list = await api.getProjects();
@@ -50,7 +49,6 @@ export default function Home() {
     }
   };
 
-  // Load specific project details
   const loadProjectDetail = async (id: string) => {
     try {
       const detail = await api.getProject(id);
@@ -123,8 +121,8 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080b11] text-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
-      {/* Navbar */}
+    <div className="min-h-screen bg-[#f8fafd] text-[#1f1f1f] flex flex-col font-sans selection:bg-[#c2e7ff] selection:text-[#001d35]">
+      {/* Google Workspace App Bar */}
       <Navbar
         projects={projects}
         selectedProjectId={currentProject?.id || null}
@@ -134,111 +132,128 @@ export default function Home() {
 
       <main className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 py-6 space-y-6">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-24 text-slate-500 space-y-3 font-mono text-xs">
-            <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
-            <span>CONNECTING TO CHRONOMIND ENGINE...</span>
+          <div className="flex flex-col items-center justify-center py-24 text-[#5f6368] space-y-3">
+            <Loader2 className="h-8 w-8 animate-spin text-[#0b57d0]" />
+            <span className="text-xs font-medium">Đang tải dữ liệu Chronomind...</span>
           </div>
         ) : !currentProject ? (
-          /* Empty Launchpad / Welcoming Workbench */
+          /* Empty Welcoming Launchpad (Google Workspace style) */
           <div className="py-16 text-center max-w-2xl mx-auto space-y-6">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-lg border border-white/[0.1] bg-[#121824] text-blue-400">
-              <Terminal className="h-7 w-7" />
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#eaf1fb] border border-[#c2e7ff] text-[#0b57d0] shadow-xs">
+              <Calendar className="h-8 w-8" />
             </div>
 
             <div className="space-y-2">
-              <h1 className="text-2xl sm:text-3xl font-bold text-slate-100 tracking-tight">
-                Chronomind • Dynamic Project & Deadline Planner
+              <h1 className="text-3xl font-bold text-[#1f1f1f] tracking-tight">
+                Chronomind • Lập Kế Hoạch & Deadline Dự Án Bằng AI
               </h1>
-              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                Hệ thống AI Project Manager: Phân rã ý tưởng thành WBS, tính toán độ khó kỹ thuật, thiết lập checklist tiền dự án, kích hoạt Deadline động và hiển thị biểu đồ Gantt.
+              <p className="text-sm text-[#5f6368] leading-relaxed">
+                Biến ý tưởng thành lộ trình kỹ thuật chi tiết, đánh giá độ khó, quản lý danh sách việc cần chuẩn bị và theo dõi tiến độ trực quan như Google Calendar.
               </p>
             </div>
 
             <div className="pt-2">
               <button
                 onClick={() => setIsWizardOpen(true)}
-                className="inline-flex h-9 items-center gap-2 rounded-md bg-blue-600 px-4 text-xs font-medium text-white shadow-xs hover:bg-blue-500 transition-colors"
+                className="inline-flex items-center gap-2.5 rounded-full bg-[#0b57d0] hover:bg-[#0842a0] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all"
               >
+                <Sparkles className="h-4 w-4" />
                 <span>Bắt đầu Lập Kế Hoạch Bằng AI</span>
-                <ArrowRight className="h-3.5 w-3.5" />
+                <ArrowRight className="h-4 w-4" />
               </button>
             </div>
 
-            {/* Asymmetrical Feature Matrix */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-6 text-left">
-              <div className="rounded-lg border border-white/[0.08] bg-[#0d111a] p-3.5">
-                <span className="font-mono text-[10px] font-semibold uppercase text-blue-400 block mb-1">
-                  01 // ANALYZER
+            {/* 3 Friendly Google-style Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 text-left">
+              <div className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-xs">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-[#eaf1fb] text-[#1a73e8] mb-3 text-sm font-bold">
+                  01
                 </span>
-                <h4 className="text-xs font-semibold text-slate-200 mb-1">AI Feasibility & Blind Spots</h4>
-                <p className="text-[11px] text-slate-400 leading-normal">
-                  Chấm điểm độ khó 1-10 và liệt kê các điểm mù người dùng thường bỏ quên.
+                <h4 className="text-sm font-bold text-[#1f1f1f] mb-1">Đánh giá độ khó AI</h4>
+                <p className="text-xs text-[#5f6368] leading-relaxed">
+                  Chấm điểm từ 1-10 và nhắc nhở các rủi ro bạn chưa tính tới.
                 </p>
               </div>
 
-              <div className="rounded-lg border border-white/[0.08] bg-[#0d111a] p-3.5">
-                <span className="font-mono text-[10px] font-semibold uppercase text-amber-400 block mb-1">
-                  02 // DYNAMIC CLOCK
+              <div className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-xs">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-[#fef7e0] text-[#b06000] mb-3 text-sm font-bold">
+                  02
                 </span>
-                <h4 className="text-xs font-semibold text-slate-200 mb-1">Smart Trigger & Gantt</h4>
-                <p className="text-[11px] text-slate-400 leading-normal">
-                  Chế độ Preparation không tính giờ. Tự động dời lịch khi xin gia hạn.
+                <h4 className="text-sm font-bold text-[#1f1f1f] mb-1">Lịch biểu Gantt</h4>
+                <p className="text-xs text-[#5f6368] leading-relaxed">
+                  Trực quan như Google Calendar. Tự động lùi hạn khi có sự cố.
                 </p>
               </div>
 
-              <div className="rounded-lg border border-white/[0.08] bg-[#0d111a] p-3.5">
-                <span className="font-mono text-[10px] font-semibold uppercase text-emerald-400 block mb-1">
-                  03 // EXPORTER
+              <div className="rounded-2xl border border-[#e5e7eb] bg-white p-5 shadow-xs">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-[#e6f4ea] text-[#137333] mb-3 text-sm font-bold">
+                  03
                 </span>
-                <h4 className="text-xs font-semibold text-slate-200 mb-1">Excel WBS & Word Report</h4>
-                <p className="text-[11px] text-slate-400 leading-normal">
-                  Xuất file `.xlsx` định dạng màu chuẩn và `.docx` báo cáo tiến độ hoàn chỉnh.
+                <h4 className="text-sm font-bold text-[#1f1f1f] mb-1">Xuất file Excel & Word</h4>
+                <p className="text-xs text-[#5f6368] leading-relaxed">
+                  Tải ngay bảng WBS (.xlsx) và báo cáo tiến độ chuẩn chỉnh (.docx).
                 </p>
               </div>
             </div>
           </div>
         ) : (
-          /* Active Project Workspace */
-          <div className="space-y-6">
-            {/* Top Engineering Context Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
+          /* Active Project Workspace (Google Workspace theme) */
+          <div className="space-y-5">
+            {/* Project Header Bar */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#e5e7eb]">
               <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-mono text-[10px] uppercase tracking-wider text-blue-400 font-semibold">
-                    PROJECT WORKSPACE
+                <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                  <span
+                    className={`rounded-full px-3 py-0.5 text-xs font-semibold border ${
+                      currentProject.status === "PREPARATION"
+                        ? "bg-[#fef7e0] text-[#b06000] border-[#feefc3]"
+                        : currentProject.status === "ACTIVE"
+                        ? "bg-[#e6f4ea] text-[#137333] border-[#ceead6]"
+                        : "bg-[#e8f0fe] text-[#1a73e8] border-[#c2e7ff]"
+                    }`}
+                  >
+                    {currentProject.status === "PREPARATION"
+                      ? "Chờ Chuẩn Bị"
+                      : currentProject.status === "ACTIVE"
+                      ? "Đang Triển Khai"
+                      : "Hoàn Tất"}
                   </span>
-                  <span className="text-slate-600">•</span>
-                  <span className="font-mono text-[10px] text-slate-400">
-                    ID: #{currentProject.id.slice(0, 8)}
+                  <span className="text-gray-300">•</span>
+                  <span className="text-xs text-[#5f6368]">
+                    Khối lượng: <strong>{currentProject.total_estimated_hours}h</strong>
+                  </span>
+                  <span className="text-gray-300">•</span>
+                  <span className="text-xs text-[#5f6368]">
+                    Quỹ thời gian: <strong>{currentProject.available_hours_per_week}h/tuần</strong> ({currentProject.skill_level})
                   </span>
                 </div>
 
-                <h1 className="text-xl sm:text-2xl font-bold text-slate-100 tracking-tight">
+                <h1 className="text-2xl font-bold text-[#1f1f1f] tracking-tight">
                   {currentProject.title}
                 </h1>
 
                 {currentProject.target_goal && (
-                  <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5 font-mono">
-                    <span className="text-slate-500">Mục tiêu:</span> {currentProject.target_goal}
+                  <p className="text-xs text-[#5f6368] mt-1 flex items-center gap-1.5">
+                    <span className="font-semibold text-[#0b57d0]">Mục tiêu đầu ra:</span> {currentProject.target_goal}
                   </p>
                 )}
               </div>
 
-              {/* Header Action Tools */}
-              <div className="flex items-center gap-2 shrink-0">
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2.5 shrink-0">
                 <ExportMenu projectId={currentProject.id} projectTitle={currentProject.title} />
 
                 <button
                   onClick={handleDeleteProject}
                   title="Xóa dự án này"
-                  className="h-8 w-8 inline-flex items-center justify-center rounded-md border border-white/[0.08] bg-[#121824] text-slate-400 hover:border-rose-500/40 hover:text-rose-400 transition-colors shadow-xs"
+                  className="h-9 w-9 inline-flex items-center justify-center rounded-full border border-[#dadce0] bg-white text-[#5f6368] hover:text-[#ea4335] hover:border-[#fad2cf] hover:bg-[#fce8e6] transition-all shadow-xs"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
+                  <Trash2 className="h-4 w-4" />
                 </button>
               </div>
             </div>
 
-            {/* Core Feature 1: Feasibility Card (Tremor KPI Row + Blind Spots) */}
+            {/* Core Feature 1: Feasibility Card (Metrics + AI Review + Blind Spots) */}
             <FeasibilityCard
               score={currentProject.complexity_score}
               explanation={currentProject.complexity_explanation}
@@ -257,20 +272,20 @@ export default function Home() {
               onViewExtensionHistory={() => setIsHistoryOpen(true)}
             />
 
-            {/* Overall Progress Minimal Bar */}
-            <div className="rounded-lg border border-white/[0.08] bg-[#0d111a] px-4 py-3">
-              <div className="flex justify-between items-center font-mono text-[11px] mb-1.5">
-                <span className="text-slate-400 flex items-center gap-1.5">
-                  <Activity className="h-3.5 w-3.5 text-blue-400" />
-                  <span>TIẾN ĐỘ THỰC HIỆN TỔNG THỂ</span>
+            {/* Overall Progress Bar */}
+            <div className="rounded-2xl border border-[#e5e7eb] bg-white px-5 py-3.5 shadow-xs">
+              <div className="flex justify-between items-center text-xs mb-1.5">
+                <span className="font-semibold text-[#1f1f1f] flex items-center gap-1.5">
+                  <Activity className="h-4 w-4 text-[#0b57d0]" />
+                  <span>Tiến độ tổng thể dự án</span>
                 </span>
-                <span className="font-bold text-slate-200 tabular-nums">
-                  {currentProject.progress_percentage}% HOÀN TẤT
+                <span className="font-bold text-[#0b57d0]">
+                  {currentProject.progress_percentage}% Hoàn thành
                 </span>
               </div>
-              <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+              <div className="w-full bg-[#f1f3f4] rounded-full h-2 overflow-hidden">
                 <div
-                  className="bg-blue-500 h-full rounded-full transition-all duration-300"
+                  className="bg-[#0b57d0] h-full rounded-full transition-all duration-300"
                   style={{ width: `${currentProject.progress_percentage}%` }}
                 />
               </div>
@@ -313,9 +328,9 @@ export default function Home() {
         </>
       )}
 
-      {/* Clean Technical Footer */}
-      <footer className="border-t border-white/[0.08] py-4 text-center font-mono text-[11px] text-slate-500">
-        CHRONOMIND • PRECISION ENGINEERING PROJECT PLANNER © 2026
+      {/* Google Workspace Footer */}
+      <footer className="border-t border-[#e5e7eb] bg-white py-4 text-center text-xs text-[#5f6368]">
+        Chronomind • AI Dynamic Project & Deadline Planner © 2026
       </footer>
     </div>
   );

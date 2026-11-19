@@ -1,43 +1,55 @@
 @import "tailwindcss";
 
 :root {
-  --canvas-default: #080b11;
-  --canvas-subtle: #0d111a;
-  --canvas-inset: #121824;
-  --canvas-elevated: #182030;
+  --background: #f8fafd;
+  --surface: #ffffff;
+  --surface-container: #f0f4f9;
+  --surface-hover: #edf2fa;
 
-  --border-default: rgba(255, 255, 255, 0.08);
-  --border-subtle: rgba(255, 255, 255, 0.04);
-  --border-active: rgba(255, 255, 255, 0.18);
+  --google-blue: #0b57d0;
+  --google-blue-hover: #0842a0;
+  --google-blue-container: #c2e7ff;
+  --google-blue-on-container: #001d35;
 
-  --fg-default: #f1f5f9;
-  --fg-muted: #94a3b8;
-  --fg-subtle: #64748b;
-  --fg-disabled: #334155;
+  --google-green: #137333;
+  --google-green-container: #e6f4ea;
+  
+  --google-amber: #b06000;
+  --google-amber-container: #fef7e0;
+
+  --google-red: #c5221f;
+  --google-red-container: #fce8e6;
+
+  --border-subtle: #e0e2ec;
+  --border-light: #e8eaed;
+
+  --text-primary: #1f1f1f;
+  --text-secondary: #444746;
+  --text-muted: #5f6368;
 }
 
 body {
-  background-color: var(--canvas-default);
-  color: var(--fg-default);
+  background-color: var(--background);
+  color: var(--text-primary);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   -webkit-font-smoothing: antialiased;
 }
 
-/* Custom hairline borders and scrollbars */
+/* Google-style soft scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #080b11;
+  background: #f1f3f4;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 3px;
+  background: #dadce0;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: #bdc1c6;
 }

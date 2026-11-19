@@ -11,9 +11,9 @@ import {
   Package,
   Layers,
   RefreshCw,
-  CheckSquare,
-  Square,
-  AlertCircle,
+  CheckCircle2,
+  Circle,
+  Sparkles,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { Project } from "@/types";
@@ -38,15 +38,15 @@ export const PreparationBanner: React.FC<PreparationBannerProps> = ({
   const getCategoryBadge = (category: string) => {
     switch (category) {
       case "KNOWLEDGE":
-        return <span className="text-[10px] font-mono text-sky-400 bg-sky-500/10 border border-sky-500/20 px-1.5 py-0.5 rounded">KNOWLEDGE</span>;
+        return <span className="text-[11px] font-semibold text-[#1a73e8] bg-[#e8f0fe] px-2 py-0.5 rounded-full">Kiến thức</span>;
       case "EQUIPMENT":
-        return <span className="text-[10px] font-mono text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded">HARDWARE</span>;
+        return <span className="text-[11px] font-semibold text-[#b06000] bg-[#fef7e0] px-2 py-0.5 rounded-full">Phần cứng</span>;
       case "ENVIRONMENT":
-        return <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded">DEV-ENV</span>;
+        return <span className="text-[11px] font-semibold text-[#137333] bg-[#e6f4ea] px-2 py-0.5 rounded-full">Môi trường</span>;
       case "RESOURCE":
-        return <span className="text-[10px] font-mono text-purple-400 bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 rounded">RESOURCE</span>;
+        return <span className="text-[11px] font-semibold text-[#9333ea] bg-[#f3e8fd] px-2 py-0.5 rounded-full">Tài nguyên</span>;
       default:
-        return <span className="text-[10px] font-mono text-slate-400 bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded">OTHER</span>;
+        return <span className="text-[11px] font-semibold text-[#5f6368] bg-[#f1f3f4] px-2 py-0.5 rounded-full">Khác</span>;
     }
   };
 
@@ -72,25 +72,28 @@ export const PreparationBanner: React.FC<PreparationBannerProps> = ({
 
   if (project.status === "PREPARATION") {
     return (
-      <div className="rounded-lg border border-amber-500/30 bg-[#0d111a] p-4.5">
+      <div className="rounded-2xl border border-[#feefc3] bg-white p-5 shadow-xs">
         {/* Banner Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 mb-4 border-b border-white/[0.06]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-[#f1f3f4]">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-ping" />
-              <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-amber-400">
-                CHẾ ĐỘ CHỜ CHUẨN BỊ (PREPARATION MODE)
+              <span className="h-2 w-2 rounded-full bg-[#fbbc04] animate-ping" />
+              <span className="text-xs font-bold uppercase tracking-wider text-[#b06000]">
+                Chế độ Chuẩn Bị (Preparation Mode)
               </span>
             </div>
-            <p className="text-xs text-slate-400 max-w-2xl">
-              Đồng hồ deadline <strong>CHƯA</strong> chạy. Hãy tick hoàn thành các mục chuẩn bị (mua sắm linh kiện, học kiến thức nền). Khi sẵn sàng, bấm Kick-off để kích hoạt lịch động.
+            <h3 className="text-base font-bold text-[#1f1f1f]">
+              Đồng hồ Deadline chưa chạy! Hãy hoàn thành Checklist chuẩn bị
+            </h3>
+            <p className="text-xs text-[#5f6368] mt-0.5 max-w-2xl">
+              Hệ thống không gây áp lực thời gian. Hãy mua sắm linh kiện, học kiến thức nền hoặc cài đặt môi trường. Khi bạn sẵn sàng, bấm &quot;Bắt đầu dự án&quot; để chính thức tính lịch trình.
             </p>
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            <span className="font-mono text-xs text-slate-400">
-              Đã xong:{" "}
-              <strong className={isAllReady ? "text-emerald-400" : "text-amber-400"}>
+            <span className="text-xs font-medium text-[#5f6368]">
+              Đã chuẩn bị:{" "}
+              <strong className={isAllReady ? "text-[#137333]" : "text-[#b06000]"}>
                 {completedPrereqs}/{totalPrereqs}
               </strong>
             </span>
@@ -98,35 +101,36 @@ export const PreparationBanner: React.FC<PreparationBannerProps> = ({
             <button
               onClick={handleKickoffClick}
               disabled={kickoffLoading}
-              className={`inline-flex h-8 items-center gap-1.5 rounded-md px-3.5 text-xs font-medium text-white shadow-xs transition-colors ${
+              className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-semibold text-white shadow-xs hover:shadow-md transition-all ${
                 isAllReady
-                  ? "bg-emerald-600 hover:bg-emerald-500 focus-visible:ring-emerald-500/50"
-                  : "bg-blue-600 hover:bg-blue-500 focus-visible:ring-blue-500/50"
+                  ? "bg-[#137333] hover:bg-[#0f5b28]"
+                  : "bg-[#0b57d0] hover:bg-[#0842a0]"
               }`}
             >
-              <Play className="h-3.5 w-3.5 fill-current" />
-              <span>{kickoffLoading ? "Đang kích hoạt..." : "Sẵn sàng Kick-off"}</span>
+              <Play className="h-3.5 w-3.5 fill-white" />
+              <span>{kickoffLoading ? "Đang khởi động..." : "Sẵn sàng Bắt đầu (Kick-off)"}</span>
+              <Sparkles className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
 
-        {/* Prerequisites Checklist Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+        {/* Google Tasks style Checklist */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {project.prerequisites.map((prereq) => (
             <div
               key={prereq.id}
               onClick={() => onTogglePrereq(prereq.id)}
-              className={`flex items-start gap-3 rounded-md border p-3 cursor-pointer transition-colors ${
+              className={`flex items-start gap-3 rounded-xl border p-3.5 cursor-pointer transition-all ${
                 prereq.is_completed
-                  ? "border-emerald-500/20 bg-emerald-500/[0.03] text-slate-400"
-                  : "border-white/[0.06] bg-[#121824] hover:border-white/[0.15] text-slate-200"
+                  ? "border-[#ceead6] bg-[#e6f4ea]/40 text-[#5f6368]"
+                  : "border-[#e5e7eb] bg-[#f8fafd] hover:bg-[#f0f4f9] hover:border-[#dadce0] text-[#1f1f1f]"
               }`}
             >
-              <button type="button" className="mt-0.5 shrink-0 text-slate-400">
+              <button type="button" className="mt-0.5 shrink-0 focus:outline-none">
                 {prereq.is_completed ? (
-                  <CheckSquare className="h-4 w-4 text-emerald-400" />
+                  <CheckCircle2 className="h-4 w-4 text-[#137333]" />
                 ) : (
-                  <Square className="h-4 w-4 text-slate-500" />
+                  <Circle className="h-4 w-4 text-[#5f6368]" />
                 )}
               </button>
 
@@ -134,15 +138,15 @@ export const PreparationBanner: React.FC<PreparationBannerProps> = ({
                 <div className="flex items-center gap-2 mb-1">
                   {getCategoryBadge(prereq.category)}
                   <span
-                    className={`text-xs font-medium truncate ${
-                      prereq.is_completed ? "line-through text-slate-500" : "text-slate-100"
+                    className={`text-xs font-semibold truncate ${
+                      prereq.is_completed ? "line-through text-[#5f6368]" : "text-[#1f1f1f]"
                     }`}
                   >
                     {prereq.title}
                   </span>
                 </div>
                 {prereq.description && (
-                  <p className="text-[11px] text-slate-400 line-clamp-1 leading-normal">
+                  <p className="text-xs text-[#5f6368] line-clamp-1">
                     {prereq.description}
                   </p>
                 )}
@@ -154,56 +158,67 @@ export const PreparationBanner: React.FC<PreparationBannerProps> = ({
     );
   }
 
-  // ACTIVE or COMPLETED state
+  // ACTIVE or COMPLETED state (Google Calendar Event card)
   return (
-    <div className="rounded-lg border border-white/[0.08] bg-[#0d111a] px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
-      <div className="flex items-center gap-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-md border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
-          <Clock className="h-4 w-4" />
+    <div className="rounded-2xl border border-[#ceead6] bg-white p-4.5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex items-center gap-3.5">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e6f4ea] text-[#137333] border border-[#ceead6]">
+          <Clock className="h-5 w-5" />
         </div>
 
         <div>
-          <div className="flex items-center gap-2 font-mono text-xs">
-            <span className="font-semibold text-emerald-400">
-              {project.status === "COMPLETED" ? "DỰ ÁN ĐÃ HOÀN TẤT" : "ĐANG CHẠY THEO LỊCH TRÌNH ĐỘNG"}
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className="h-2 w-2 rounded-full bg-[#137333] animate-pulse" />
+            <span className="text-xs font-bold uppercase tracking-wider text-[#137333]">
+              {project.status === "COMPLETED" ? "Dự án đã hoàn tất!" : "Đang thực hiện theo lịch trình"}
             </span>
-            <span className="text-slate-600">•</span>
-            <span className="text-slate-400">
-              Kick-off:{" "}
-              <strong className="text-slate-200 tabular-nums">
+          </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#5f6368]">
+            <span>
+              Bắt đầu:{" "}
+              <strong className="text-[#1f1f1f]">
                 {project.kick_off_date ? new Date(project.kick_off_date).toLocaleDateString("vi-VN") : "N/A"}
               </strong>
             </span>
-            <span className="text-slate-600">•</span>
-            <span className="text-slate-400">
+            <span>•</span>
+            <span>
               Hạn chót:{" "}
-              <strong className="text-amber-400 tabular-nums">
+              <strong className="text-[#b06000] font-semibold">
                 {project.estimated_completion_date
                   ? new Date(project.estimated_completion_date).toLocaleDateString("vi-VN")
                   : "N/A"}
               </strong>
             </span>
+            {project.extensions.length > 0 && (
+              <>
+                <span>•</span>
+                <span className="text-[#0b57d0] font-medium">
+                  Đã gia hạn {project.extensions.length} lần (+
+                  {project.extensions.reduce((acc, e) => acc + e.days_added, 0)} ngày)
+                </span>
+              </>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2.5">
         {project.status !== "COMPLETED" && (
           <button
             onClick={onOpenReschedule}
-            className="inline-flex h-8 items-center gap-1.5 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 text-xs font-mono text-amber-300 hover:bg-amber-500/20 transition-colors"
+            className="flex items-center gap-1.5 rounded-full border border-[#feefc3] bg-[#fef7e0] px-4 py-2 text-xs font-semibold text-[#b06000] hover:bg-[#feefc3] transition-all shadow-xs"
           >
             <RefreshCw className="h-3.5 w-3.5" />
-            <span>Gia hạn (+days)</span>
+            <span>Xin gia hạn (+days)</span>
           </button>
         )}
 
         {project.extensions.length > 0 && (
           <button
             onClick={onViewExtensionHistory}
-            className="inline-flex h-8 items-center rounded-md border border-white/[0.08] bg-[#121824] px-3 font-mono text-xs text-slate-300 hover:bg-white/[0.06] transition-colors"
+            className="rounded-full border border-[#dadce0] bg-white px-3.5 py-2 text-xs font-medium text-[#3c4043] hover:bg-[#f8fafd] transition-all"
           >
-            Lịch sử trễ hạn ({project.extensions.length})
+            Lịch sử gia hạn ({project.extensions.length})
           </button>
         )}
       </div>
