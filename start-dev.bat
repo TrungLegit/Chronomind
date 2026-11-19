@@ -13,27 +13,75 @@ echo.
 :: 1. Kiem tra moi truong he thong (Python va Node.js)
 echo [1/5] Kiem tra moi truong he thong...
 set PYTHON_CMD=
-python -c "import sys" >nul 2>nul
-if not errorlevel 1 (
-    set PYTHON_CMD=python
-    goto :python_found
-)
-py -3 -c "import sys" >nul 2>nul
+
+:: 1.1 Uu tien py -3 (Python Launcher chuan cua Windows)
+py -3 -m pip --version >nul 2>nul
 if not errorlevel 1 (
     set PYTHON_CMD=py -3
     goto :python_found
 )
-py -c "import sys" >nul 2>nul
+
+:: 1.2 Thu py
+py -m pip --version >nul 2>nul
 if not errorlevel 1 (
     set PYTHON_CMD=py
     goto :python_found
 )
 
+:: 1.3 Duyet qua tat ca python.exe tim thay tren he thong (bo qua msys64 va WindowsApps)
+for /f "tokens=*" %%P in ('where python 2^>nul') do (
+    set "CANDIDATE=%%P"
+    echo !CANDIDATE! | findstr /i "msys64 WindowsApps" >nul
+    if errorlevel 1 (
+        "%%P" -m pip --version >nul 2>nul
+        if not errorlevel 1 (
+            set PYTHON_CMD="%%P"
+            goto :python_found
+        )
+    )
+)
+
+:: 1.4 Quet truc tiep thu muc AppData Programs Python
+for /d %%D in ("%LocalAppData%\Programs\Python\Python*") do (
+    if exist "%%~fD\python.exe" (
+        "%%~fD\python.exe" -m pip --version >nul 2>nul
+        if not errorlevel 1 (
+            set PYTHON_CMD="%%~fD\python.exe"
+            goto :python_found
+        )
+    )
+)
+
+:: 1.5 Quet thu muc goc C:\Python
+for /d %%D in ("C:\Python*") do (
+    if exist "%%~fD\python.exe" (
+        "%%~fD\python.exe" -m pip --version >nul 2>nul
+        if not errorlevel 1 (
+            set PYTHON_CMD="%%~fD\python.exe"
+            goto :python_found
+        )
+    )
+)
+
+:: 1.6 Quet Program Files
+for /d %%D in ("%ProgramFiles%\Python*") do (
+    if exist "%%~fD\python.exe" (
+        "%%~fD\python.exe" -m pip --version >nul 2>nul
+        if not errorlevel 1 (
+            set PYTHON_CMD="%%~fD\python.exe"
+            goto :python_found
+        )
+    )
+)
+
 :err_no_python
 echo.
-echo [LOI] Khong tim thay Python thuc su hoat dong tren he thong!
-echo Vui long cai dat Python 3.10 tro len tai: https://www.python.org/downloads/
-echo *Luu y: Nho tick chon vao o 'Add python.exe to PATH' khi cai dat.
+echo [LOI] Khong tim thay Python chuan co san thu vien 'pip' tren may tinh!
+echo (He thong da phat hien hoac bi chan boi trinh bien dich nhu msys64 khong ho tro pip).
+echo Vui long cai dat ban Python chinh thuc tu: https://www.python.org/downloads/
+echo *Luu y quan trong:
+echo   1. Khi cai dat, nho tich chon vao o 'Add python.exe to PATH'.
+echo   2. Chon 'Install pip' de co the cai dat cac thu vien can thiet.
 echo.
 pause
 exit /b 1
@@ -42,7 +90,8 @@ exit /b 1
 where npm >nul 2>nul
 if errorlevel 1 goto :err_no_npm
 
-echo [OK] Python (!PYTHON_CMD!) va Node.js da san sang.
+echo [OK] Da tim thay Python chuan co pip: !PYTHON_CMD!
+echo [OK] Node.js da san sang.
 echo.
 
 :: 2. Kiem tra cap nhat tu GitHub (neu co git)
@@ -115,7 +164,7 @@ echo   Dang tu dong khoi tao Python Virtual Environment...
 echo ==========================================================
 pushd "%~dp0backend"
 if exist "venv" rmdir /s /q "venv" >nul 2>nul
-!PYTHON_CMD! -m venv venv
+call !PYTHON_CMD! -m venv venv
 if exist "venv\Scripts\python.exe" (
     set RUN_PY="%~dp0backend\venv\Scripts\python.exe"
     echo [OK] Da tao thanh cong Virtual Environment venv.
