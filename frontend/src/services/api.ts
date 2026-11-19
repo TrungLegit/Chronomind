@@ -11,15 +11,32 @@ const getBaseUrl = (): string => {
   return "http://localhost:8000/api";
 };
 
+const fetchWithRetry = async (url: string, options?: RequestInit, retries = 2, delay = 700): Promise<Response> => {
+  try {
+    return await fetch(url, options);
+  } catch (err) {
+    if (retries > 0) {
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      return fetchWithRetry(url, options, retries - 1, delay * 1.5);
+    }
+    throw err;
+  }
+};
+
 export const api = {
   async getProjects(): Promise<ProjectSummary[]> {
-    const res = await fetch(`${getBaseUrl()}/projects`, { cache: "no-store" });
-    if (!res.ok) throw new Error("Failed to fetch projects");
-    return res.json();
+    try {
+      const res = await fetchWithRetry(`${getBaseUrl()}/projects`, { cache: "no-store" });
+      if (!res.ok) return [];
+      return res.json();
+    } catch (e) {
+      console.warn("Chronomind: Dang ket noi Backend...", e);
+      return [];
+    }
   },
 
   async getProject(id: string): Promise<Project> {
-    const res = await fetch(`${getBaseUrl()}/projects/${id}`, { cache: "no-store" });
+    const res = await fetchWithRetry(`${getBaseUrl()}/projects/${id}`, { cache: "no-store" });
     if (!res.ok) throw new Error("Failed to fetch project details");
     return res.json();
   },
@@ -164,16 +181,20 @@ export const api = {
     project: any;
     next_task: any;
   }> {
-    const res = await fetch(`${getBaseUrl()}/projects/session/last-active`, { cache: "no-store" });
-    if (!res.ok) return { has_recent: false, project: null, next_task: null };
-    return res.json();
+    try {
+      const res = await fetchWithRetry(`${getBaseUrl()}/projects/session/last-active`, { cache: "no-store" }, 1, 500);
+      if (!res.ok) return { has_recent: false, project: null, next_task: null };
+      return res.json();
+    } catch (e) {
+      return { has_recent: false, project: null, next_task: null };
+    }
   },
 
   async markProjectAsActive(id: string): Promise<void> {
     try {
       await fetch(`${getBaseUrl()}/projects/${id}/mark-active`, { method: "POST" });
     } catch (e) {
-      // Ignore network errors on local
+      // Ignore
     }
   },
 
@@ -238,4 +259,3 @@ export const api = {
     }
   },
 };
-
