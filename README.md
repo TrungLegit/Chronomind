@@ -3,55 +3,130 @@
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688.svg?style=flat&logo=fastapi)](https://fastapi.tiangolo.com)
 [![Next.js](https://img.shields.io/badge/Frontend-Next.js%2015-black.svg?style=flat&logo=next.js)](https://nextjs.org)
 [![Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind%20CSS-38B2AC.svg?style=flat&logo=tailwind-css)](https://tailwindcss.com)
-[![OpenAI & Gemini](https://img.shields.io/badge/AI-OpenAI%20%7C%20Gemini-412991.svg?style=flat&logo=google-gemini)](https://ai.google.dev)
+[![Google Theme](https://img.shields.io/badge/UI-Google%20Workspace-4285F4.svg?style=flat&logo=google)](https://workspace.google.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **Chronomind** là hệ thống Quản lý Dự án & Lập lịch Thông minh tích hợp AI đóng vai trò như một **AI Project Manager**. Hệ thống giải quyết bài toán cốt lõi: Người dùng có ý tưởng (phần mềm, phần cứng IoT, nghiên cứu, kinh doanh...) nhưng chưa hình dung được quy mô, độ khó, các bước thực hiện và thời gian khả thi. Chronomind tự động phân tích ý tưởng, cảnh báo điểm mù, thiết lập checklist tiền dự án, kích hoạt deadline động và xuất báo cáo WBS chuyên nghiệp ra Excel & Word.
+> **Chronomind** là hệ thống Quản lý Dự án & Lập lịch Thông minh tích hợp AI đóng vai trò như một **AI Project Manager**. Hệ thống tự động phân tích ý tưởng dự án, chấm điểm độ khó (1-10), cảnh báo điểm mù, thiết lập checklist tiền dự án, kích hoạt deadline động với biểu đồ **Gantt Calendar**, tự động ghi nhớ phiên làm việc trên local và xuất báo cáo WBS chuyên nghiệp ra Excel & Word.
 
 ---
 
-## 📑 Mục lục
-1. [Điểm nổi bật & Tính năng cốt lõi](#-tính-năng-cốt-lõi-core-features)
-2. [Kiến trúc hệ thống (System Architecture)](#-kiến-trúc-hệ-thống)
-3. [Tech Stack](#-tech-stack)
-4. [Cấu trúc thư mục chuẩn](#-cấu-trúc-thư-mục-chuẩn)
-5. [Thiết kế Database Schema](#-thiết-kế-database-schema)
-6. [Hướng dẫn cài đặt & Khởi chạy nhanh](#-hướng-dẫn-cài-đặt--chạy-dự-án)
-7. [API Endpoints](#-danh-sách-api-endpoints)
-8. [Lộ trình phát triển (Roadmap)](#-lộ-trình-phát-triển-roadmap)
+## 🚀 HƯỚNG DẪN KHỞI CHẠY NHANH TRÊN MÁY LOCAL (QUICK START)
+
+Bạn có thể chạy dự án trên máy tính cá nhân bằng 1 trong 3 cách cực kỳ đơn giản dưới đây:
+
+### Cách 1: Chạy 1-Click bằng Script (Khuyên dùng)
+* **Trên Windows:** Chỉ cần nhấp đúp vào file `start-dev.bat` (hoặc mở PowerShell gõ `.\start-dev.bat`).
+* **Trên macOS / Linux:** Mở Terminal và chạy:
+  ```bash
+  chmod +x start-dev.sh
+  ./start-dev.sh
+  ```
 
 ---
 
-## 🌟 Tính năng cốt lõi (Core Features)
+### Cách 2: Chạy bằng Docker Compose (1 lệnh duy nhất)
+```bash
+docker-compose up --build
+```
 
-### 1. AI Đánh giá Khả thi & Điểm mù (AI Feasibility & Complexity Analyzer)
-* **Đầu vào linh hoạt:** Người dùng chỉ cần nhập mô tả ý tưởng (dù còn mơ hồ), mục tiêu mong muốn, số giờ rảnh mỗi tuần (5h - 40h), và trình độ hiện tại.
-* **Chấm điểm độ khó (1.0 - 10.0):** AI phân tích rủi ro kỹ thuật, phân loại dự án (Hardware IoT, AI/ML, Fullstack Web, Business) và đưa ra điểm số kèm nhận định chuyên môn.
-* **Cảnh báo Điểm mù (Blind Spots):** Nhắc nhở những điều người dùng "chưa hình dung tới" (VD: làm phần cứng thì cần thời gian đặt mạch/linh kiện, làm web cần thời gian deploy & fix bug, chi phí token LLM, hoặc rủi ro re-spin PCB).
-* **Checklist Tiền Dự Án (Prerequisites):** Liệt kê danh mục chuẩn bị phân loại rõ theo: *Kiến thức (Knowledge), Thiết bị (Equipment), Môi trường (Environment), Tài nguyên (Resource)* cần hoàn tất trước khi bắt tay làm thật.
+---
 
-### 2. Kích hoạt Thông minh & Deadline Động (Smart Trigger & Dynamic Deadline)
+### Cách 3: Chạy thủ công từng phần
+
+#### 1. Khởi động Backend (FastAPI - Python):
+```bash
+cd backend
+python -m venv venv
+
+# Kích hoạt môi trường ảo:
+# Trên Windows:
+.\venv\Scripts\activate
+# Trên macOS/Linux:
+# source venv/bin/activate
+
+pip install -r requirements.txt
+cp .env.example .env
+
+# Chạy server API:
+uvicorn app.main:app --reload --port 8000
+```
+
+#### 2. Khởi động Frontend (Next.js - TypeScript):
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+### 🌐 Đường dẫn truy cập hệ thống:
+* **Giao diện Web (Next.js):** [http://localhost:3000](http://localhost:3000)
+* **Tài liệu API tương tác (Swagger UI):** [http://localhost:8000/docs](http://localhost:8000/docs)
+
+---
+
+## 📸 HÌNH ẢNH GIAO DIỆN WEB LOCAL THỰC TẾ
+
+### 1. Giao diện Workspace phong cách Google Workspace / Google Calendar
+Toàn bộ giao diện được thiết kế theo theme trắng sáng thanh lịch, tinh tế và thân thiện:
+- Thẻ đo lường KPI (Độ khó kỹ thuật, Khối lượng giờ làm, Quỹ thời gian, Điểm mù).
+- Nhận định kiến trúc từ Gemini AI Assistant & Hộp cảnh báo điểm mù (Blind spots).
+- Banner **Chế độ Chuẩn Bị (Preparation Mode)** & Checklist công việc phong cách Google Tasks.
+- Biểu đồ **Gantt Timeline** phong cách sự kiện Google Calendar với vạch chỉ dấu "Hôm nay" màu đỏ và sọc gia hạn màu hổ phách.
+
+![Chronomind Local Workspace Dashboard](docs/images/dashboard.png)
+
+---
+
+### 2. Hệ thống Tài liệu API Tương Tác Tự Động (Swagger UI)
+Backend FastAPI cung cấp đầy đủ các API chuẩn RESTful cho việc phân tích AI, kích hoạt kick-off, gia hạn downstream phases, xuất file Excel & Word:
+
+![Chronomind API Swagger Docs](docs/images/api_swagger.png)
+
+---
+
+## 🌟 TÍNH NĂNG CỐT LÕI (CORE FEATURES)
+
+### 1. 🧠 AI Phân Tích Độ Khó & Cảnh Báo Điểm Mù (Feasibility Analyzer)
+* **Đầu vào linh hoạt:** Người dùng chỉ cần nhập mô tả ý tưởng (dù sơ khai), mục tiêu đầu ra, số giờ rảnh mỗi tuần (5h - 40h), và trình độ hiện tại.
+* **Chấm điểm độ khó (1.0 - 10.0):** Phân loại dự án (Hardware IoT, AI/ML, Fullstack Web, Business) và đưa ra điểm số kèm nhận định chuyên môn.
+* **Cảnh báo Điểm mù (Blind Spots):** Nhắc nhở những điều người dùng "chưa hình dung tới" (VD: thời gian chờ giao linh kiện, debug và xử lý ngoại lệ chiếm 30-40% thời gian, sụt áp nguồn/nhiễu EMI, độ trễ API LLM...).
+* **Checklist Chuẩn bị (Prerequisites):** Liệt kê danh mục chuẩn bị rõ ràng theo: *Kiến thức (Knowledge), Phần cứng (Hardware), Môi trường (Dev-Env), Tài nguyên (Resource)* cần hoàn tất trước khi bắt tay làm thật.
+
+### 2. ⏱️ Kích Hoạt Thông Minh & Deadline Động (Smart Trigger & Dynamic Phasing)
 * **Chế độ Chờ Chuẩn Bị (Preparation Mode):** Đồng hồ đếm ngược **CHƯA** chạy ngay khi tạo dự án. Người dùng thoải mái chuẩn bị đồ đạc và tick vào checklist.
-* **Smart Trigger (Kick-off):** Chỉ khi người dùng bấm nút **"Sẵn sàng bắt đầu" (Ready to Kick-off)**, hệ thống mới chính thức quy đổi khối lượng giờ sang ngày lịch thực tế dựa trên quỹ thời gian rảnh mỗi tuần, tự động gán ngày bắt đầu và ngày hoàn thành cho từng Phase và Task.
-* **Gia hạn Thông minh (Smart Rescheduling / Extension):** Khi bị trễ hạn hoặc gặp sự cố bất khả kháng, người dùng có thể gửi yêu cầu gia hạn (+N ngày) kèm lý do. AI Rescheduling Engine đánh giá mức độ ảnh hưởng, đưa ra lời khuyên gỡ rối, và **tự động tịnh tiến (downstream shift)** toàn bộ các Phase tiếp theo mà không làm vỡ cấu trúc tổng thể.
+* **Smart Trigger (Kick-off):** Chỉ khi người dùng bấm nút **"Sẵn sàng Bắt đầu (Kick-off)"**, hệ thống mới chính thức quy đổi khối lượng giờ sang ngày làm việc thực tế dựa trên quỹ thời gian rảnh mỗi tuần, phân bổ ngày bắt đầu/kết thúc cho từng Phase và Task, đồng thời bắn pháo hoa ăn mừng!
+* **Gia hạn Thông minh (Smart Rescheduling):** Khi bị trễ hạn, người dùng gửi yêu cầu (+N ngày) kèm lý do. Hệ thống kích hoạt thuật toán **tịnh tiến các Phase phía sau (Downstream Shifts)**, giữ nguyên tiến độ các Phase đã xong và cập nhật hạn chót dự kiến.
 
-### 3. Xuất Báo cáo Tiến độ Tự động (Automated Document & Report Exporter)
-* **Xuất file Excel (`.xlsx`):**
+### 3. 📅 Biểu Đồ Gantt Trực Quan Dạng Google Calendar
+* **Trục thời gian tương tác (Dynamic Timescale):** Hỗ trợ xem linh hoạt theo từng Ngày (`days`) hoặc Thu nhỏ (`weeks`).
+* **Khối sự kiện Calendar (Event Blocks):** Thanh tiến độ bo góc mềm mại, hiển thị trực quan phần việc đã hoàn thành (`progress fill`).
+* **Vạch chỉ dấu Gia hạn (Extension Stripes):** Khi một giai đoạn được gia hạn, vùng ngày gia hạn thêm được tô sọc màu hổ phách mềm mại.
+* **Cột mốc (Milestones):** Gắn biểu tượng ngôi sao vàng (★) tại các thời điểm đạt cột mốc quan trọng.
+* **Vạch "Hôm nay" (Today Marker):** Đường kẻ đứng màu đỏ đánh dấu ngày hiện tại trong toàn bộ lộ trình.
+
+### 4. 💾 Cơ Chế Ghi Nhớ Cục Bộ & Khôi Phục Phiên (Session Persistence)
+* **Banner "Tiếp tục công việc trước đó":** Khi mở lại app, hệ thống tự động nhận diện dự án bạn thao tác gần nhất, hiển thị tiến độ và gợi ý ngay **việc tiếp theo cần làm**. Bấm 1 click là tiếp tục công việc ngay lập tức.
+* **Tự động lưu bản nháp (Draft Auto-Save):** Tự động ghi nhớ nội dung ý tưởng đang gõ dở vào LocalStorage & SQLite. Lỡ tắt tab hoặc F5 vẫn khôi phục nguyên vẹn 100%.
+
+### 5. 📑 Xuất Báo Cáo Chuyên Nghiệp (Excel & Word)
+* **Xuất file Excel (`.xlsx` qua `openpyxl`):**
   - **Sheet 1 (Project Summary):** Thẻ KPI tổng quan, điểm số AI, bảng checklist chuẩn bị kèm trạng thái.
-  - **Sheet 2 (WBS & Schedule):** Bảng phân rã công việc (Work Breakdown Structure) chi tiết từng Phase/Task, gắn nhãn Milestone (★), cột ngày dự kiến, và tự động tô màu có điều kiện (Conditional Formatting: Xanh lá cho Done, Xanh dương cho In Progress, Đỏ hồng cho Delayed).
+  - **Sheet 2 (WBS & Schedule):** Bảng Work Breakdown Structure chi tiết từng Phase/Task, gắn nhãn Milestone (★), cột ngày dự kiến, và tự động tô màu có điều kiện (Done: Xanh lá, Running: Xanh dương, Delayed: Đỏ nhạt).
   - **Sheet 3 (Extension History):** Nhật ký gia hạn, số ngày đã lùi và phân tích từ AI.
-* **Xuất file Word (`.docx`):** Bản báo cáo tiến độ chuẩn chỉnh (Project Status Report) gồm: Tóm tắt dự án, Đánh giá độ khó ban đầu, Danh sách điểm mù, Bảng tiến độ từng Phase, và Nhật ký sự cố.
+* **Xuất file Word (`.docx` qua `python-docx`):** Bản báo cáo tình trạng dự án chuẩn chỉnh gồm: Tóm tắt dự án, Đánh giá độ khó ban đầu, Danh sách điểm mù, Bảng tiến độ từng Phase, và Nhật ký sự cố.
 
 ---
 
-## 🏛️ Kiến trúc hệ thống
+## 🏛️ KIẾN TRÚC HỆ THỐNG (SYSTEM ARCHITECTURE)
 
 ```mermaid
 graph TD
-    User([Người dùng / Project Lead]) -->|Nhập ý tưởng & Quỹ thời gian| FE[Next.js 15 Frontend / React + Tailwind]
+    User([Người dùng Local]) -->|Mô tả ý tưởng & Giờ rảnh| FE[Next.js Frontend / React 19 + Tailwind]
     FE -->|REST API Requests| BE[FastAPI Backend Server]
     
-    subgraph Core Engine
+    subgraph AI & Engine Lõi
         BE --> AIEngine[AI Engine<br/>Gemini / OpenAI / Heuristic]
         BE --> Scheduler[Dynamic Deadline Scheduler]
         BE --> ExporterExcel[Excel Exporter<br/>openpyxl]
@@ -59,86 +134,27 @@ graph TD
     end
 
     AIEngine -->|Structured JSON Output| BE
-    Scheduler -->|Tính toán tịnh tiến ngày| DB[(SQLite / PostgreSQL Database)]
+    Scheduler -->|Tính toán tịnh tiến ngày| DB[(SQLite Local Database<br/>chronomind.db)]
     BE -->|Trả về .xlsx & .docx| FE
-    FE -->|Tải file báo cáo & Quản lý Task| User
+    FE -->|Biểu đồ Gantt & Báo cáo| User
 ```
 
 ---
 
-## 💻 Tech Stack
+## 💻 TECH STACK
 
 | Tầng | Công nghệ | Mục đích |
 |---|---|---|
-| **Frontend** | Next.js 15 (App Router), React, TypeScript | Giao diện Single Page reactive, chuẩn SEO và hiệu năng cao |
-| **Giao diện & UI** | Tailwind CSS v4, Lucide React, Canvas Confetti | Giao diện hiện đại, Dark Mode mặc định, hiệu ứng sinh động |
-| **Backend** | Python FastAPI, Uvicorn | Hiệu năng cao, xử lý bất đồng bộ, tích hợp AI mượt mà |
-| **Cơ sở dữ liệu** | SQLAlchemy 2.0, SQLite (hỗ trợ chuyển PostgreSQL) | ORM linh hoạt, dễ dàng chạy local không cần cài DB server phức tạp |
-| **Xử lý Báo cáo** | `openpyxl`, `python-docx` | Xuất file bảng tính Excel và văn bản Word chuẩn văn phòng |
-| **AI Integration** | Google Gemini API / OpenAI API / Heuristic fallback | Đảm bảo hệ thống hoạt động 100% kể cả khi không có API key (offline demo) |
+| **Frontend** | Next.js 15 (App Router), React 19, TypeScript | Giao diện Single Page reactive, hiệu năng cao |
+| **Giao diện & UI** | Tailwind CSS v4, Lucide Icons, Canvas Confetti | Chuẩn Google Workspace / Material 3, Theme trắng thanh lịch |
+| **Backend** | Python FastAPI, Uvicorn | Xử lý bất đồng bộ, phân tích AI và xuất báo cáo |
+| **Cơ sở dữ liệu** | SQLAlchemy 2.0, SQLite | Lưu trữ cục bộ nhẹ nhàng, không cần cài server DB phức tạp |
+| **Xử lý Báo cáo** | `openpyxl`, `python-docx` | Xuất file bảng tính Excel và văn bản Word chuẩn văn phòng UTF-8 |
+| **AI Integration** | Google Gemini API / OpenAI API / Heuristic Fallback | Tự động chạy mượt mà ngay cả khi không có mạng / không có API key |
 
 ---
 
-## 📂 Cấu trúc thư mục chuẩn
-
-```
-Chronomind/
-├── backend/
-│   ├── app/
-│   │   ├── api/
-│   │   │   ├── endpoints/
-│   │   │   │   ├── projects.py       # CRUD, phân tích AI, Kick-off, Gia hạn
-│   │   │   │   ├── tasks.py          # Cập nhật trạng thái task, hoàn thành phase
-│   │   │   │   ├── prerequisites.py  # Toggle checklist chuẩn bị
-│   │   │   │   └── exports.py        # Tải file Excel & Word
-│   │   │   └── api.py                # Tổng hợp Router
-│   │   ├── models/
-│   │   │   └── models.py             # Schema Project, Phase, Task, Prerequisite, ExtensionLog
-│   │   ├── schemas/
-│   │   │   └── schemas.py            # Pydantic schemas & AI Structured Output
-│   │   ├── services/
-│   │   │   ├── ai_engine.py          # Kết nối LLM & Heuristic planner thông minh
-│   │   │   ├── scheduler.py          # Thuật toán tính deadline động & tịnh tiến lịch
-│   │   │   ├── exporter_excel.py     # Định dạng bảng tính WBS Excel (.xlsx)
-│   │   │   └── exporter_word.py      # Định dạng báo cáo Word (.docx)
-│   │   ├── config.py                 # Biến môi trường & cấu hình hệ thống
-│   │   ├── database.py               # Session & kết nối SQLAlchemy
-│   │   └── main.py                   # FastAPI Application entrypoint
-│   ├── requirements.txt              # Danh sách thư viện Python
-│   ├── Dockerfile                    # Docker build backend
-│   └── .env.example                  # File mẫu biến môi trường backend
-├── frontend/
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── layout.tsx            # Root layout Next.js
-│   │   │   ├── globals.css           # Tailwind CSS styles
-│   │   │   └── page.tsx              # Giao diện chính Dashboard & Workspace
-│   │   ├── components/
-│   │   │   ├── Navbar.tsx            # Thanh điều hướng & chuyển đổi dự án
-│   │   │   ├── ProjectWizardModal.tsx# Modal phân tích ý tưởng bằng AI
-│   │   │   ├── FeasibilityCard.tsx   # Thẻ đánh giá độ khó (1-10) & Điểm mù
-│   │   │   ├── PreparationBanner.tsx # Chế độ Preparation & Nút Kick-off
-│   │   │   ├── TimelineRoadmap.tsx   # Danh sách Phase, Task, Milestone
-│   │   │   ├── RescheduleModal.tsx   # Modal xin gia hạn thông minh
-│   │   │   ├── ExtensionHistoryDrawer.tsx # Lịch sử trễ hạn & lời khuyên AI
-│   │   │   └── ExportMenu.tsx        # Menu tải file Excel / Word
-│   │   ├── services/
-│   │   │   └── api.ts                # Client kết nối Backend API
-│   │   └── types/
-│   │       └── index.ts              # TypeScript interfaces
-│   ├── package.json
-│   ├── Dockerfile                    # Docker build frontend
-│   └── tsconfig.json
-├── docker-compose.yml                # Chạy toàn bộ hệ thống bằng 1 lệnh
-├── start-dev.bat                     # Chạy nhanh local trên Windows
-├── start-dev.sh                      # Chạy nhanh local trên Linux/macOS
-├── .env.example                      # File mẫu cấu hình toàn cục
-└── README.md
-```
-
----
-
-## 🗄️ Thiết kế Database Schema
+## 🗄️ THIẾT KẾ DATABASE SCHEMA
 
 ```
 ┌──────────────────────────┐         ┌──────────────────────────┐
@@ -170,91 +186,18 @@ Chronomind/
 │ created_at               │         │ title, description       │
 └──────────────────────────┘         │ estimated_hours          │
                                      │ is_milestone (Boolean)   │
-                                     │ priority (LOW/MED/HIGH)  │
-                                     │ status (TODO/IN_PROG/DONE│
-                                     │ planned_date             │
-                                     └──────────────────────────┘
+┌──────────────────────────┐         │ priority (LOW/MED/HIGH)  │
+│       SYSTEM_STATE       │         │ status (TODO/IN_PROG/DONE│
+├──────────────────────────┤         │ planned_date             │
+│ key (PK)                 │         └──────────────────────────┘
+│ value (Text/JSON)        │
+│ updated_at               │
+└──────────────────────────┘
 ```
 
 ---
 
-## 🚀 Hướng dẫn Cài đặt & Chạy dự án
-
-### Cách 1: Chạy bằng 1 click script (Khuyên dùng)
-#### Trên Windows:
-Chỉ cần nhấp đúp vào file `start-dev.bat` hoặc mở PowerShell:
-```powershell
-.\start-dev.bat
-```
-
-#### Trên macOS / Linux:
-```bash
-chmod +x start-dev.sh
-./start-dev.sh
-```
-
----
-
-### Cách 2: Chạy bằng Docker Compose
-```bash
-docker-compose up --build
-```
-Hệ thống sẽ tự động build Backend (port 8000) và Frontend (port 3000).
-
----
-
-### Cách 3: Chạy thủ công từng phần
-
-#### 1. Khởi chạy Backend (FastAPI):
-```bash
-cd backend
-python -m venv venv
-
-# Kích hoạt môi trường ảo:
-# Trên Windows:
-.\venv\Scripts\activate
-# Trên macOS/Linux:
-# source venv/bin/activate
-
-pip install -r requirements.txt
-cp .env.example .env
-
-# Chạy server:
-uvicorn app.main:app --reload --port 8000
-```
-API Documentation tự động có sẵn tại: `http://localhost:8000/docs`
-
-#### 2. Khởi chạy Frontend (Next.js):
-```bash
-cd frontend
-npm install
-npm run dev
-```
-Truy cập ứng dụng tại: `http://localhost:3000`
-
----
-
-## 🔑 Cấu hình Biến môi trường (.env)
-
-Tạo file `.env` tại thư mục `backend/` (hoặc tại thư mục gốc khi dùng Docker):
-
-```env
-# Chronomind Configuration
-PROJECT_NAME="Chronomind - AI Dynamic Project Planner"
-DATABASE_URL="sqlite:///./chronomind.db"
-
-# Tùy chọn: Nhập API key của bạn để sử dụng model AI mới nhất
-# Nếu để trống, Chronomind tự động kích hoạt bộ giả lập heuristic thông minh để demo mượt mà!
-GEMINI_API_KEY="your-gemini-api-key"
-OPENAI_API_KEY="your-openai-api-key"
-
-DEFAULT_AI_PROVIDER="auto"  # "auto", "gemini", hoặc "openai"
-CORS_ORIGINS=["http://localhost:3000","http://127.0.0.1:3000","*"]
-```
-
----
-
-## 📡 Danh sách API Endpoints
+## 📡 DANH SÁCH API ENDPOINTS
 
 | Phương thức | Endpoint | Mô tả |
 |---|---|---|
@@ -268,22 +211,28 @@ CORS_ORIGINS=["http://localhost:3000","http://127.0.0.1:3000","*"]
 | `POST` | `/api/prerequisites/{id}/toggle` | Đánh dấu hoàn thành hạng mục chuẩn bị |
 | `GET` | `/api/projects/{id}/export/excel` | Xuất bảng kế hoạch WBS ra `.xlsx` (kèm conditional color) |
 | `GET` | `/api/projects/{id}/export/word` | Xuất báo cáo trạng thái ra `.docx` chuyên nghiệp |
+| `GET` | `/api/projects/session/last-active`| Lấy dự án thao tác gần nhất & việc tiếp theo cần làm |
+| `POST` | `/api/projects/{id}/mark-active` | Cập nhật dự án đang kích hoạt trong phiên làm việc |
+| `POST` | `/api/projects/session/draft` | Lưu bản nháp ý tưởng tự động |
+| `GET` | `/api/projects/session/draft` | Lấy lại bản nháp ý tưởng đã lưu |
 
 ---
 
-## 🗺️ Lộ trình phát triển (Roadmap)
+## 🗺️ LỘ TRÌNH PHÁT TRIỂN (ROADMAP)
 
-- [x] **v1.0 (Hiện tại):**
+- [x] **v1.0:**
   - AI Feasibility & Complexity Analyzer (chấm điểm 1-10 & rà soát điểm mù).
   - Preparation Mode & Smart Kick-off Trigger.
-  - Smart Rescheduling tịnh tiến lịch trình khi có sự cố.
+  - Biểu đồ Gantt trực quan dạng Google Calendar.
+  - Cơ chế ghi nhớ cục bộ & khôi phục phiên (Session Persistence & Auto-Resume).
+  - Giao diện Google Workspace / Gmail Theme trắng sáng thân thiện.
   - Xuất bảng WBS Excel & báo cáo Word có định dạng đẹp.
 - [ ] **v1.1:** Tích hợp đồng bộ 2 chiều với **Google Calendar** (Tự động tạo sự kiện cho từng Phase & Milestone).
 - [ ] **v1.2:** Tích hợp **Telegram Bot & Discord Webhook** nhắc nhở deadline và cảnh báo trễ tiến độ hằng ngày.
-- [ ] **v1.3:** Đồng bộ trực tiếp với **GitHub Issues & Projects** (tự tạo milestone và issue tương ứng từ WBS).
+- [ ] **v1.3:** Kết nối trực tiếp với **GitHub Issues & Projects** (tự động tạo issue từ task WBS).
 
 ---
 
-## 📄 License
-Dự án được phân phối dưới giấy phép **MIT License**.
+## 📄 LICENSE
+Dự án được phân phối dưới giấy phép **MIT License**.  
 Phát triển bởi cộng đồng Open Source & Google DeepMind Antigravity Agent.
