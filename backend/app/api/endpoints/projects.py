@@ -349,3 +349,17 @@ def clear_wizard_draft(db: Session = Depends(get_db)):
         db.commit()
     return {"status": "cleared"}
 
+@router.get("/system/check-updates")
+def check_github_updates():
+    """Checks whether the local git repo is behind origin/main."""
+    try:
+        import subprocess
+        # Fast fetch with timeout
+        subprocess.run(["git", "fetch", "origin", "main", "--quiet"], timeout=3, check=False)
+        res = subprocess.run(["git", "rev-list", "HEAD..origin/main", "--count"], capture_output=True, text=True, timeout=2)
+        count = int(res.stdout.strip()) if res.stdout and res.stdout.strip().isdigit() else 0
+        return {"has_update": count > 0, "behind_count": count}
+    except Exception:
+        return {"has_update": False, "behind_count": 0}
+
+

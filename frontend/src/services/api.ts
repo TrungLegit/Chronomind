@@ -130,5 +130,15 @@ export const api = {
       // Ignore
     }
   },
+
+  async checkUpdates(): Promise<{ has_update: boolean; behind_count: number }> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/projects/system/check-updates`, { cache: "no-store" });
+      if (!res.ok) return { has_update: false, behind_count: 0 };
+      return res.json();
+    } catch (e) {
+      return { has_update: false, behind_count: 0 };
+    }
+  },
 };
 

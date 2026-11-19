@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
-import { Plus, Calendar, Search, FolderKanban, Sparkles } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Plus, Calendar, Search, FolderKanban, Sparkles, Bell } from "lucide-react";
 import { ProjectSummary } from "@/types";
+import { api } from "@/services/api";
 
 interface NavbarProps {
   projects: ProjectSummary[];
@@ -18,6 +19,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenNewProject,
 }) => {
   const current = projects.find((p) => p.id === selectedProjectId);
+  const [updateInfo, setUpdateInfo] = useState<{ has_update: boolean; behind_count: number }>({
+    has_update: false,
+    behind_count: 0,
+  });
+
+  useEffect(() => {
+    api.checkUpdates().then(setUpdateInfo).catch(() => {});
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-[#e5e7eb] bg-white shadow-xs">
@@ -66,6 +75,16 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Right: Project Status Pill & Google-style "+ Tạo mới" Pill Button */}
         <div className="flex items-center gap-3">
+          {updateInfo.has_update && (
+            <div
+              title="Phát hiện bản cập nhật mới trên GitHub. Hãy chạy 'git pull' hoặc mở lại start-dev.bat để cập nhật!"
+              className="hidden lg:flex items-center gap-1.5 rounded-full bg-[#fef7e0] border border-[#feefc3] text-[#b06000] px-3 py-1 text-xs font-semibold shadow-xs animate-pulse cursor-help"
+            >
+              <Bell className="h-3.5 w-3.5 text-[#b06000]" />
+              <span>Có {updateInfo.behind_count} cập nhật mới trên GitHub</span>
+            </div>
+          )}
+
           {current && (
             <div className="hidden sm:flex items-center gap-1.5">
               <span
