@@ -1,18 +1,38 @@
-# Build and Release Folders
-bin-debug/
-bin-release/
-[Oo]bj/
-[Bb]in/
+# Node & Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.vercel
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Other files and folders
-.settings/
+# Python & Virtual Environments
+backend/venv/
+backend/env/
+backend/__pycache__/
+backend/*/__pycache__/
+backend/*/*/__pycache__/
+backend/*/*/*/__pycache__/
+*.py[cod]
+*$py.class
+*.so
 
-# Executables
-*.swf
-*.air
-*.ipa
-*.apk
+# Database
+*.db
+*.sqlite
+*.sqlite3
+backend/chronomind.db
 
-# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
-# should NOT be excluded as they contain compiler settings and other important
-# information for Eclipse / Flash Builder.
+# Environment variables & secrets
+.env
+backend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+# Operating System & IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
