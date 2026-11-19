@@ -3,21 +3,20 @@
 import React, { useState } from "react";
 import {
   Clock,
-  CheckCircle2,
   Play,
   Calendar,
-  AlertCircle,
   BookOpen,
   Cpu,
   Terminal,
   Package,
   Layers,
-  Sparkles,
-  ArrowRight,
   RefreshCw,
+  CheckSquare,
+  Square,
+  AlertCircle,
 } from "lucide-react";
 import confetti from "canvas-confetti";
-import { Project, Prerequisite } from "@/types";
+import { Project } from "@/types";
 
 interface PreparationBannerProps {
   project: Project;
@@ -36,33 +35,18 @@ export const PreparationBanner: React.FC<PreparationBannerProps> = ({
 }) => {
   const [kickoffLoading, setKickoffLoading] = useState(false);
 
-  const getCategoryIcon = (category: string) => {
+  const getCategoryBadge = (category: string) => {
     switch (category) {
       case "KNOWLEDGE":
-        return <BookOpen className="h-4 w-4 text-sky-400" />;
+        return <span className="text-[10px] font-mono text-sky-400 bg-sky-500/10 border border-sky-500/20 px-1.5 py-0.5 rounded">KNOWLEDGE</span>;
       case "EQUIPMENT":
-        return <Cpu className="h-4 w-4 text-amber-400" />;
+        return <span className="text-[10px] font-mono text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded">HARDWARE</span>;
       case "ENVIRONMENT":
-        return <Terminal className="h-4 w-4 text-emerald-400" />;
+        return <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded">DEV-ENV</span>;
       case "RESOURCE":
-        return <Package className="h-4 w-4 text-purple-400" />;
+        return <span className="text-[10px] font-mono text-purple-400 bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 rounded">RESOURCE</span>;
       default:
-        return <Layers className="h-4 w-4 text-slate-400" />;
-    }
-  };
-
-  const getCategoryLabel = (category: string) => {
-    switch (category) {
-      case "KNOWLEDGE":
-        return "Kiến thức / Nghiên cứu";
-      case "EQUIPMENT":
-        return "Phần cứng / Thiết bị";
-      case "ENVIRONMENT":
-        return "Môi trường / Cài đặt";
-      case "RESOURCE":
-        return "Tài nguyên / API";
-      default:
-        return "Chuẩn bị khác";
+        return <span className="text-[10px] font-mono text-slate-400 bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded">OTHER</span>;
     }
   };
 
@@ -70,10 +54,9 @@ export const PreparationBanner: React.FC<PreparationBannerProps> = ({
     setKickoffLoading(true);
     try {
       await onKickoff();
-      // Fire celebration confetti!
       confetti({
-        particleCount: 100,
-        spread: 70,
+        particleCount: 80,
+        spread: 60,
         origin: { y: 0.6 },
       });
     } catch (err: any) {
@@ -89,93 +72,83 @@ export const PreparationBanner: React.FC<PreparationBannerProps> = ({
 
   if (project.status === "PREPARATION") {
     return (
-      <div className="rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-950/40 via-slate-900/80 to-slate-900 p-6 shadow-xl backdrop-blur-md">
+      <div className="rounded-lg border border-amber-500/30 bg-[#0d111a] p-4.5">
         {/* Banner Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-5 border-b border-indigo-500/20">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 mb-4 border-b border-white/[0.06]">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="flex h-3 w-3 rounded-full bg-amber-400 animate-ping" />
-              <span className="text-xs uppercase font-bold tracking-wider text-amber-400">
-                Chế độ chờ chuẩn bị (Preparation Mode)
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-ping" />
+              <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-amber-400">
+                CHẾ ĐỘ CHỜ CHUẨN BỊ (PREPARATION MODE)
               </span>
             </div>
-            <h3 className="text-xl font-bold text-white">
-              Đồng hồ Deadline chưa chạy! Hãy hoàn thành Checklist chuẩn bị
-            </h3>
-            <p className="text-xs text-slate-400 mt-1 max-w-2xl">
-              Hệ thống sẽ không gây áp lực thời gian cho đến khi bạn sẵn sàng. Mua sắm linh kiện, học kiến thức nền, hoặc cài đặt môi trường. Khi xong, bấm &quot;Sẵn sàng bắt đầu&quot; để kích hoạt lịch trình động.
+            <p className="text-xs text-slate-400 max-w-2xl">
+              Đồng hồ deadline <strong>CHƯA</strong> chạy. Hãy tick hoàn thành các mục chuẩn bị (mua sắm linh kiện, học kiến thức nền). Khi sẵn sàng, bấm Kick-off để kích hoạt lịch động.
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
+            <span className="font-mono text-xs text-slate-400">
+              Đã xong:{" "}
+              <strong className={isAllReady ? "text-emerald-400" : "text-amber-400"}>
+                {completedPrereqs}/{totalPrereqs}
+              </strong>
+            </span>
+
             <button
               onClick={handleKickoffClick}
               disabled={kickoffLoading}
-              className={`flex items-center gap-2.5 rounded-xl px-5 py-3 text-sm font-bold text-white shadow-lg transition-all ${
+              className={`inline-flex h-8 items-center gap-1.5 rounded-md px-3.5 text-xs font-medium text-white shadow-xs transition-colors ${
                 isAllReady
-                  ? "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 shadow-emerald-500/30 animate-bounce"
-                  : "bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-indigo-500/30"
+                  ? "bg-emerald-600 hover:bg-emerald-500 focus-visible:ring-emerald-500/50"
+                  : "bg-blue-600 hover:bg-blue-500 focus-visible:ring-blue-500/50"
               }`}
             >
-              <Play className="h-4 w-4 fill-white" />
-              <span>{kickoffLoading ? "Đang kích hoạt..." : "Sẵn sàng bắt đầu (Kick-off)"}</span>
-              <Sparkles className="h-4 w-4" />
+              <Play className="h-3.5 w-3.5 fill-current" />
+              <span>{kickoffLoading ? "Đang kích hoạt..." : "Sẵn sàng Kick-off"}</span>
             </button>
           </div>
         </div>
 
-        {/* Prerequisites Checklist */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-              <span>Checklist Chuẩn bị Tiền Dự Án (Prerequisites)</span>
-            </h4>
-            <span className="text-xs font-medium text-slate-400">
-              Đã hoàn thành:{" "}
-              <strong className={isAllReady ? "text-emerald-400" : "text-indigo-400"}>
-                {completedPrereqs} / {totalPrereqs}
-              </strong>
-            </span>
-          </div>
+        {/* Prerequisites Checklist Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+          {project.prerequisites.map((prereq) => (
+            <div
+              key={prereq.id}
+              onClick={() => onTogglePrereq(prereq.id)}
+              className={`flex items-start gap-3 rounded-md border p-3 cursor-pointer transition-colors ${
+                prereq.is_completed
+                  ? "border-emerald-500/20 bg-emerald-500/[0.03] text-slate-400"
+                  : "border-white/[0.06] bg-[#121824] hover:border-white/[0.15] text-slate-200"
+              }`}
+            >
+              <button type="button" className="mt-0.5 shrink-0 text-slate-400">
+                {prereq.is_completed ? (
+                  <CheckSquare className="h-4 w-4 text-emerald-400" />
+                ) : (
+                  <Square className="h-4 w-4 text-slate-500" />
+                )}
+              </button>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {project.prerequisites.map((prereq) => (
-              <div
-                key={prereq.id}
-                onClick={() => onTogglePrereq(prereq.id)}
-                className={`flex items-start gap-3 rounded-xl border p-3.5 cursor-pointer transition-all ${
-                  prereq.is_completed
-                    ? "border-emerald-500/30 bg-emerald-950/20 text-slate-300"
-                    : "border-slate-800 bg-slate-950/60 hover:border-indigo-500/50 hover:bg-slate-900 text-slate-200"
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  aria-label={prereq.title}
-                  checked={prereq.is_completed}
-                  onChange={() => {}}
-                  className="mt-1 h-4 w-4 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    {getCategoryIcon(prereq.category)}
-                    <span className="text-[10px] uppercase font-semibold text-slate-400">
-                      {getCategoryLabel(prereq.category)}
-                    </span>
-                  </div>
-                  <h5 className={`text-sm font-semibold ${prereq.is_completed ? "line-through text-slate-400" : "text-white"}`}>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  {getCategoryBadge(prereq.category)}
+                  <span
+                    className={`text-xs font-medium truncate ${
+                      prereq.is_completed ? "line-through text-slate-500" : "text-slate-100"
+                    }`}
+                  >
                     {prereq.title}
-                  </h5>
-                  {prereq.description && (
-                    <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">
-                      {prereq.description}
-                    </p>
-                  )}
+                  </span>
                 </div>
+                {prereq.description && (
+                  <p className="text-[11px] text-slate-400 line-clamp-1 leading-normal">
+                    {prereq.description}
+                  </p>
+                )}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -183,71 +156,56 @@ export const PreparationBanner: React.FC<PreparationBannerProps> = ({
 
   // ACTIVE or COMPLETED state
   return (
-    <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-slate-900 via-slate-900/90 to-emerald-950/20 p-5 shadow-xl backdrop-blur-md">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-start sm:items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            <Clock className="h-6 w-6" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-xs uppercase font-bold tracking-wider text-emerald-400">
-                {project.status === "COMPLETED" ? "Dự án đã hoàn thành!" : "Dự án đang chạy (Active Timeline)"}
-              </span>
-            </div>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-sm text-slate-300">
-              <span>
-                Ngày Kick-off:{" "}
-                <strong className="text-white">
-                  {project.kick_off_date ? new Date(project.kick_off_date).toLocaleDateString("vi-VN") : "N/A"}
-                </strong>
-              </span>
-              <span>•</span>
-              <span>
-                Hạn chót dự kiến:{" "}
-                <strong className="text-amber-400 font-semibold">
-                  {project.estimated_completion_date
-                    ? new Date(project.estimated_completion_date).toLocaleDateString("vi-VN")
-                    : "N/A"}
-                </strong>
-              </span>
-              {project.extensions.length > 0 && (
-                <>
-                  <span>•</span>
-                  <button
-                    onClick={onViewExtensionHistory}
-                    className="text-xs text-indigo-400 underline hover:text-indigo-300"
-                  >
-                    Đã gia hạn {project.extensions.length} lần (+
-                    {project.extensions.reduce((acc, e) => acc + e.days_added, 0)} ngày)
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
+    <div className="rounded-lg border border-white/[0.08] bg-[#0d111a] px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="flex items-center gap-3">
+        <div className="flex h-8 w-8 items-center justify-center rounded-md border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+          <Clock className="h-4 w-4" />
         </div>
 
-        <div className="flex items-center gap-2">
-          {project.status !== "COMPLETED" && (
-            <button
-              onClick={onOpenReschedule}
-              className="flex items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-bold text-amber-300 hover:bg-amber-500/20 hover:border-amber-500/50 transition"
-            >
-              <RefreshCw className="h-3.5 w-3.5" />
-              <span>Gia hạn Thông minh (Smart Reschedule)</span>
-            </button>
-          )}
-
-          {project.extensions.length > 0 && (
-            <button
-              onClick={onViewExtensionHistory}
-              className="rounded-xl border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition"
-            >
-              Lịch sử trễ hạn ({project.extensions.length})
-            </button>
-          )}
+        <div>
+          <div className="flex items-center gap-2 font-mono text-xs">
+            <span className="font-semibold text-emerald-400">
+              {project.status === "COMPLETED" ? "DỰ ÁN ĐÃ HOÀN TẤT" : "ĐANG CHẠY THEO LỊCH TRÌNH ĐỘNG"}
+            </span>
+            <span className="text-slate-600">•</span>
+            <span className="text-slate-400">
+              Kick-off:{" "}
+              <strong className="text-slate-200 tabular-nums">
+                {project.kick_off_date ? new Date(project.kick_off_date).toLocaleDateString("vi-VN") : "N/A"}
+              </strong>
+            </span>
+            <span className="text-slate-600">•</span>
+            <span className="text-slate-400">
+              Hạn chót:{" "}
+              <strong className="text-amber-400 tabular-nums">
+                {project.estimated_completion_date
+                  ? new Date(project.estimated_completion_date).toLocaleDateString("vi-VN")
+                  : "N/A"}
+              </strong>
+            </span>
+          </div>
         </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        {project.status !== "COMPLETED" && (
+          <button
+            onClick={onOpenReschedule}
+            className="inline-flex h-8 items-center gap-1.5 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 text-xs font-mono text-amber-300 hover:bg-amber-500/20 transition-colors"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            <span>Gia hạn (+days)</span>
+          </button>
+        )}
+
+        {project.extensions.length > 0 && (
+          <button
+            onClick={onViewExtensionHistory}
+            className="inline-flex h-8 items-center rounded-md border border-white/[0.08] bg-[#121824] px-3 font-mono text-xs text-slate-300 hover:bg-white/[0.06] transition-colors"
+          >
+            Lịch sử trễ hạn ({project.extensions.length})
+          </button>
+        )}
       </div>
     </div>
   );

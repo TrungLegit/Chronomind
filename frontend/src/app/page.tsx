@@ -2,18 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  Sparkles,
   Plus,
-  Calendar,
-  Clock,
-  Layers,
-  CheckCircle2,
-  AlertTriangle,
-  FolderKanban,
   Trash2,
-  ChevronRight,
+  Terminal,
+  Calendar,
+  Layers,
   TrendingUp,
-  BrainCircuit,
+  Activity,
+  ArrowRight,
+  Loader2,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { ProjectWizardModal } from "@/components/ProjectWizardModal";
@@ -67,13 +64,11 @@ export default function Home() {
     loadProjects();
   }, []);
 
-  // Handle Project Creation via AI
   const handleCreateProject = async (data: ProjectCreateInput) => {
     const newProj = await api.createProject(data);
     await loadProjects(newProj.id);
   };
 
-  // Handle Prerequisite Toggle
   const handleTogglePrereq = async (prereqId: string) => {
     if (!currentProject) return;
     try {
@@ -84,7 +79,6 @@ export default function Home() {
     }
   };
 
-  // Handle Task Toggle
   const handleToggleTask = async (taskId: string) => {
     if (!currentProject) return;
     try {
@@ -95,7 +89,6 @@ export default function Home() {
     }
   };
 
-  // Handle Kickoff (Smart Trigger)
   const handleKickoff = async () => {
     if (!currentProject) return;
     try {
@@ -107,7 +100,6 @@ export default function Home() {
     }
   };
 
-  // Handle Extension
   const handleReschedule = async (data: ExtensionInput) => {
     if (!currentProject) return;
     try {
@@ -119,7 +111,6 @@ export default function Home() {
     }
   };
 
-  // Handle Delete Project
   const handleDeleteProject = async () => {
     if (!currentProject) return;
     if (!confirm(`Bạn có chắc muốn xóa dự án "${currentProject.title}"?`)) return;
@@ -132,7 +123,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-[#080b11] text-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
       {/* Navbar */}
       <Navbar
         projects={projects}
@@ -141,130 +132,123 @@ export default function Home() {
         onOpenNewProject={() => setIsWizardOpen(true)}
       />
 
-      <main className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <main className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 py-6 space-y-6">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-24 text-slate-400 space-y-3">
-            <BrainCircuit className="h-10 w-10 animate-spin text-indigo-400" />
-            <p className="text-sm">Đang tải dữ liệu Chronomind...</p>
+          <div className="flex flex-col items-center justify-center py-24 text-slate-500 space-y-3 font-mono text-xs">
+            <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+            <span>CONNECTING TO CHRONOMIND ENGINE...</span>
           </div>
         ) : !currentProject ? (
-          /* Empty State / Welcome Hero */
+          /* Empty Launchpad / Welcoming Workbench */
           <div className="py-16 text-center max-w-2xl mx-auto space-y-6">
-            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-tr from-indigo-500/20 via-purple-500/20 to-pink-500/20 border border-indigo-500/30 shadow-2xl">
-              <Sparkles className="h-10 w-10 text-indigo-400" />
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-lg border border-white/[0.1] bg-[#121824] text-blue-400">
+              <Terminal className="h-7 w-7" />
             </div>
 
             <div className="space-y-2">
-              <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-                AI-Powered Dynamic Project & Deadline Planner
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-100 tracking-tight">
+                Chronomind • Dynamic Project & Deadline Planner
               </h1>
-              <p className="text-sm sm:text-base text-slate-400">
-                Biến những ý tưởng mơ hồ thành lộ trình kỹ thuật khả thi, tự động phát hiện điểm mù, quản lý Checklist chuẩn bị và kích hoạt Deadline động.
+              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                Hệ thống AI Project Manager: Phân rã ý tưởng thành WBS, tính toán độ khó kỹ thuật, thiết lập checklist tiền dự án, kích hoạt Deadline động và hiển thị biểu đồ Gantt.
               </p>
             </div>
 
-            <div className="pt-4">
+            <div className="pt-2">
               <button
                 onClick={() => setIsWizardOpen(true)}
-                className="inline-flex items-center gap-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-3.5 text-base font-bold text-white shadow-xl shadow-indigo-500/30 hover:from-indigo-500 hover:to-violet-500 transition-all hover:scale-105"
+                className="inline-flex h-9 items-center gap-2 rounded-md bg-blue-600 px-4 text-xs font-medium text-white shadow-xs hover:bg-blue-500 transition-colors"
               >
-                <Sparkles className="h-5 w-5" />
                 <span>Bắt đầu Lập Kế Hoạch Bằng AI</span>
+                <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>
 
-            {/* Feature highlights */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-10 text-left">
-              <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-                <span className="text-xl mb-2 block">🧠</span>
-                <h4 className="text-sm font-bold text-white mb-1">AI Feasibility Analyzer</h4>
-                <p className="text-xs text-slate-400">
-                  Chấm điểm độ khó từ 1-10 và rà soát các điểm mù dễ bị bỏ quên.
+            {/* Asymmetrical Feature Matrix */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-6 text-left">
+              <div className="rounded-lg border border-white/[0.08] bg-[#0d111a] p-3.5">
+                <span className="font-mono text-[10px] font-semibold uppercase text-blue-400 block mb-1">
+                  01 // ANALYZER
+                </span>
+                <h4 className="text-xs font-semibold text-slate-200 mb-1">AI Feasibility & Blind Spots</h4>
+                <p className="text-[11px] text-slate-400 leading-normal">
+                  Chấm điểm độ khó 1-10 và liệt kê các điểm mù người dùng thường bỏ quên.
                 </p>
               </div>
 
-              <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-                <span className="text-xl mb-2 block">⏱️</span>
-                <h4 className="text-sm font-bold text-white mb-1">Dynamic Deadline</h4>
-                <p className="text-xs text-slate-400">
-                  Chế độ Preparation không tính giờ cho đến khi bạn sẵn sàng Kick-off.
+              <div className="rounded-lg border border-white/[0.08] bg-[#0d111a] p-3.5">
+                <span className="font-mono text-[10px] font-semibold uppercase text-amber-400 block mb-1">
+                  02 // DYNAMIC CLOCK
+                </span>
+                <h4 className="text-xs font-semibold text-slate-200 mb-1">Smart Trigger & Gantt</h4>
+                <p className="text-[11px] text-slate-400 leading-normal">
+                  Chế độ Preparation không tính giờ. Tự động dời lịch khi xin gia hạn.
                 </p>
               </div>
 
-              <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-                <span className="text-xl mb-2 block">📑</span>
-                <h4 className="text-sm font-bold text-white mb-1">Xuất Báo Cáo Tự Động</h4>
-                <p className="text-xs text-slate-400">
-                  Xuất file Excel (.xlsx) chuẩn WBS và Word (.docx) chuyên nghiệp.
+              <div className="rounded-lg border border-white/[0.08] bg-[#0d111a] p-3.5">
+                <span className="font-mono text-[10px] font-semibold uppercase text-emerald-400 block mb-1">
+                  03 // EXPORTER
+                </span>
+                <h4 className="text-xs font-semibold text-slate-200 mb-1">Excel WBS & Word Report</h4>
+                <p className="text-[11px] text-slate-400 leading-normal">
+                  Xuất file `.xlsx` định dạng màu chuẩn và `.docx` báo cáo tiến độ hoàn chỉnh.
                 </p>
               </div>
             </div>
           </div>
         ) : (
           /* Active Project Workspace */
-          <div className="space-y-7">
-            {/* Project Header Bar */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+          <div className="space-y-6">
+            {/* Top Engineering Context Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
               <div>
-                <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                  <span
-                    className={`rounded-full px-2.5 py-0.5 text-xs font-bold border ${
-                      currentProject.status === "PREPARATION"
-                        ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                        : currentProject.status === "ACTIVE"
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                        : "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                    }`}
-                  >
-                    {currentProject.status === "PREPARATION"
-                      ? "Chờ Chuẩn Bị"
-                      : currentProject.status === "ACTIVE"
-                      ? "Đang Triển Khai"
-                      : "Hoàn Thành"}
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-blue-400 font-semibold">
+                    PROJECT WORKSPACE
                   </span>
-                  <span className="text-xs text-slate-500">•</span>
-                  <span className="text-xs text-slate-400">
-                    Khối lượng: ~<strong>{currentProject.total_estimated_hours}h</strong>
-                  </span>
-                  <span className="text-xs text-slate-500">•</span>
-                  <span className="text-xs text-slate-400">
-                    Năng lực: <strong>{currentProject.available_hours_per_week}h/tuần</strong> ({currentProject.skill_level})
+                  <span className="text-slate-600">•</span>
+                  <span className="font-mono text-[10px] text-slate-400">
+                    ID: #{currentProject.id.slice(0, 8)}
                   </span>
                 </div>
 
-                <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                <h1 className="text-xl sm:text-2xl font-bold text-slate-100 tracking-tight">
                   {currentProject.title}
                 </h1>
 
                 {currentProject.target_goal && (
-                  <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
-                    <span className="text-indigo-400 font-semibold">Mục tiêu:</span> {currentProject.target_goal}
+                  <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5 font-mono">
+                    <span className="text-slate-500">Mục tiêu:</span> {currentProject.target_goal}
                   </p>
                 )}
               </div>
 
-              {/* Header Actions */}
-              <div className="flex items-center gap-3">
+              {/* Header Action Tools */}
+              <div className="flex items-center gap-2 shrink-0">
                 <ExportMenu projectId={currentProject.id} projectTitle={currentProject.title} />
 
                 <button
                   onClick={handleDeleteProject}
                   title="Xóa dự án này"
-                  className="rounded-xl border border-slate-800 bg-slate-900 p-2 text-slate-400 hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-400 transition"
+                  className="h-8 w-8 inline-flex items-center justify-center rounded-md border border-white/[0.08] bg-[#121824] text-slate-400 hover:border-rose-500/40 hover:text-rose-400 transition-colors shadow-xs"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
 
-            {/* Core Feature 1: AI Feasibility & Complexity Card */}
+            {/* Core Feature 1: Feasibility Card (Tremor KPI Row + Blind Spots) */}
             <FeasibilityCard
               score={currentProject.complexity_score}
               explanation={currentProject.complexity_explanation}
               blindSpots={currentProject.blind_spots}
+              totalHours={currentProject.total_estimated_hours}
+              hoursPerWeek={currentProject.available_hours_per_week}
+              skillLevel={currentProject.skill_level}
             />
 
-            {/* Core Feature 2: Smart Trigger (Preparation vs Active) */}
+            {/* Core Feature 2: Smart Trigger (Preparation Checklist vs Active Timeline) */}
             <PreparationBanner
               project={currentProject}
               onTogglePrereq={handleTogglePrereq}
@@ -273,27 +257,32 @@ export default function Home() {
               onViewExtensionHistory={() => setIsHistoryOpen(true)}
             />
 
-            {/* Project Overall Progress Bar */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-4">
-              <div className="flex justify-between items-center text-xs mb-1.5">
-                <span className="font-semibold text-slate-300 flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-indigo-400" />
-                  <span>Tiến độ tổng thể</span>
+            {/* Overall Progress Minimal Bar */}
+            <div className="rounded-lg border border-white/[0.08] bg-[#0d111a] px-4 py-3">
+              <div className="flex justify-between items-center font-mono text-[11px] mb-1.5">
+                <span className="text-slate-400 flex items-center gap-1.5">
+                  <Activity className="h-3.5 w-3.5 text-blue-400" />
+                  <span>TIẾN ĐỘ THỰC HIỆN TỔNG THỂ</span>
                 </span>
-                <span className="font-bold text-indigo-400">{currentProject.progress_percentage}%</span>
+                <span className="font-bold text-slate-200 tabular-nums">
+                  {currentProject.progress_percentage}% HOÀN TẤT
+                </span>
               </div>
-              <div className="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
+              <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400 h-full rounded-full transition-all duration-500"
+                  className="bg-blue-500 h-full rounded-full transition-all duration-300"
                   style={{ width: `${currentProject.progress_percentage}%` }}
                 />
               </div>
             </div>
 
-            {/* Core Feature 2: Phased Execution Roadmap & WBS */}
+            {/* Core Feature 2 & 3: WBS Roadmap & Gantt Chart View */}
             <TimelineRoadmap
               phases={currentProject.phases}
               isPreparationMode={currentProject.status === "PREPARATION"}
+              kickoffDate={currentProject.kick_off_date}
+              completionDate={currentProject.estimated_completion_date}
+              extensions={currentProject.extensions}
               onToggleTask={handleToggleTask}
             />
           </div>
@@ -324,9 +313,9 @@ export default function Home() {
         </>
       )}
 
-      {/* Footer */}
-      <footer className="border-t border-slate-800 py-6 text-center text-xs text-slate-500">
-        <p>CHRONOMIND © 2026 • AI-Powered Dynamic Project & Deadline Planner</p>
+      {/* Clean Technical Footer */}
+      <footer className="border-t border-white/[0.08] py-4 text-center font-mono text-[11px] text-slate-500">
+        CHRONOMIND • PRECISION ENGINEERING PROJECT PLANNER © 2026
       </footer>
     </div>
   );
