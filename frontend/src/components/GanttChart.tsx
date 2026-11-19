@@ -69,6 +69,12 @@ export const GanttChart: React.FC<GanttChartProps> = ({
 
   return (
     <div className="rounded-2xl border border-[#e5e7eb] bg-white overflow-hidden shadow-xs">
+      {/* Mobile Swipe Hint */}
+      <div className="sm:hidden flex items-center justify-between px-4 py-1.5 bg-[#f0f4f9] border-b border-[#dadce0] text-[11px] text-[#5f6368]">
+        <span>👉 Vuốt ngang để xem toàn bộ lịch trình</span>
+        <span className="font-semibold text-[#0b57d0]">Tổng {totalDays} ngày</span>
+      </div>
+
       {/* Calendar Header Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-b border-[#f1f3f4] bg-[#f8fafd]">
         <div className="flex items-center gap-2.5">

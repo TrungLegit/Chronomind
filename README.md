@@ -22,6 +22,8 @@ Bạn có thể chạy dự án trên máy tính cá nhân bằng 1 trong 3 các
   ./start-dev.sh
   ```
 
+> 💡 **Tự động thiết lập 100% cho máy mới:** Trong lần đầu tiên chạy trên máy mới (fresh clone), script sẽ tự động kiểm tra, khởi tạo Python Virtualenv (`venv`), cài đặt toàn bộ `requirements.txt` và chạy `npm install` hoàn toàn tự động! Hai server sẽ chạy ngầm (thu nhỏ dưới taskbar để không gây phiền) và tự động mở trình duyệt web. Đồng thời, script sẽ hiển thị địa chỉ IP nội bộ để bạn mở trên điện thoại (iPhone / Android) thông qua cùng mạng Wi-Fi.
+
 ---
 
 ### Cách 2: Chạy bằng Docker Compose (1 lệnh duy nhất)
@@ -127,6 +129,18 @@ Backend FastAPI cung cấp đầy đủ các API chuẩn RESTful cho việc phâ
   - **Sheet 2 (WBS & Schedule):** Bảng Work Breakdown Structure chi tiết từng Phase/Task, gắn nhãn Milestone (★), cột ngày dự kiến, và tự động tô màu có điều kiện (Done: Xanh lá, Running: Xanh dương, Delayed: Đỏ nhạt).
   - **Sheet 3 (Extension History):** Nhật ký gia hạn, số ngày đã lùi và phân tích từ AI.
 * **Xuất file Word (`.docx` qua `python-docx`):** Bản báo cáo tình trạng dự án chuẩn chỉnh gồm: Tóm tắt dự án, Đánh giá độ khó ban đầu, Danh sách điểm mù, Bảng tiến độ từng Phase, và Nhật ký sự cố.
+
+### 7. 📱 Tương Thích Di Động Toàn Diện & Trình Giả Lập Viewport (Mobile Simulator)
+* **Trình giả lập màn hình trực quan (Interactive Mobile Simulator):**
+  * Tích hợp sẵn thanh công cụ giả lập kiểm tra tỉ lệ màn hình của tất cả các dòng thiết bị phổ biến trên thị trường:
+    * 🍏 **Apple iOS:** iPhone 16/15 Pro Max (`430x932`, 19.5:9, Dynamic Island), iPhone 16/15/14 (`393x852`), iPhone 13/12 (`390x844`), iPhone SE (`375x667`, 16:9), iPad Mini (`768x1024`, 4:3).
+    * 🤖 **Google Android:** Samsung Galaxy S24 Ultra (`412x915`, 20:9, góc vuông), Google Pixel 9/8 Pro (`412x892`), Xiaomi 14 (`393x873`), Android Phổ thông (`360x800`), Android Compact (`360x640`).
+    * 🔄 **Foldables & Dual-Screen:** Samsung Galaxy Z Fold 5 (Màn ngoài `344x904` siêu hẹp 23.1:9, Màn mở gập `768x904` gần vuông 10.6:9), Galaxy Z Flip 5 (`412x1004`, 22:9), Microsoft Surface Duo / iPhone Duo Style (`1114x720`, 2 màn hình kép có bản lề giữa).
+  * Hỗ trợ xoay ngang/dọc (**Rotate 🔄 Portrait / Landscape**) và zoom co giãn (**50% - 100% / Fit**).
+* **Quét mã QR mở trực tiếp trên Điện thoại thật (Wi-Fi Local):**
+  * Tự động phát hiện địa chỉ IP Wi-Fi nội bộ (`http://192.168.x.x:3000`).
+  * Chỉ cần mở Camera điện thoại quét mã QR là có thể sử dụng ngay lập tức mà không cần cài đặt.
+  * Hỗ trợ **PWA (Add to Home Screen)** trên Safari và Chrome để chạy mượt mà như app native toàn màn hình.
 
 ---
 

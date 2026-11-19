@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, Calendar, Search, FolderKanban, Sparkles, Bell } from "lucide-react";
+import { Plus, Calendar, Search, FolderKanban, Sparkles, Bell, Smartphone } from "lucide-react";
 import { ProjectSummary } from "@/types";
 import { api } from "@/services/api";
 
@@ -10,6 +10,7 @@ interface NavbarProps {
   selectedProjectId: string | null;
   onSelectProject: (id: string) => void;
   onOpenNewProject: () => void;
+  onOpenMobileSimulator?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -17,6 +18,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   selectedProjectId,
   onSelectProject,
   onOpenNewProject,
+  onOpenMobileSimulator,
 }) => {
   const current = projects.find((p) => p.id === selectedProjectId);
   const [updateInfo, setUpdateInfo] = useState<{ has_update: boolean; behind_count: number }>({
@@ -112,23 +114,59 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           )}
 
+          {/* Mobile Simulator button */}
+          {onOpenMobileSimulator && (
+            <button
+              onClick={onOpenMobileSimulator}
+              title="Kiểm tra tương thích hiển thị trên các dòng điện thoại iOS / Android"
+              className="flex items-center gap-1.5 rounded-full border border-[#dadce0] bg-white px-3 py-1.5 text-xs font-semibold text-[#0b57d0] hover:bg-[#eaf1fb] hover:border-[#c2e7ff] transition-all shadow-xs"
+            >
+              <Smartphone className="h-4 w-4 text-[#0b57d0]" />
+              <span className="hidden sm:inline">📱 Giả lập ĐT</span>
+            </button>
+          )}
+
           {/* Google Calendar "+ Tạo" Button */}
           <button
             onClick={onOpenNewProject}
-            className="flex items-center gap-2.5 rounded-full bg-white border border-[#dadce0] px-4 py-2 text-sm font-medium text-[#3c4043] shadow-xs hover:shadow-md hover:bg-[#f8fafd] transition-all focus:outline-none"
+            className="flex items-center gap-2 rounded-full bg-white border border-[#dadce0] px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium text-[#3c4043] shadow-xs hover:shadow-md hover:bg-[#f8fafd] transition-all focus:outline-none shrink-0"
           >
             {/* Google 4-color Plus Icon */}
-            <svg width="20" height="20" viewBox="0 0 36 36">
+            <svg width="18" height="18" viewBox="0 0 36 36" className="shrink-0">
               <path fill="#4285F4" d="M16 16v14h4V16h14v-4H20V-2h-4v14H2v4z"/>
               <path fill="#34A853" d="M30 16H20l-4-4h14z"/>
               <path fill="#4285F4" d="M6 16h10l4-4H6z"/>
               <path fill="#FBBC05" d="M20 16v14l-4-4V16z"/>
               <path fill="#EA4335" d="M20 2v14l-4-4V2z"/>
             </svg>
-            <span className="font-semibold text-[#1f1f1f]">Tạo dự án mới</span>
+            <span className="font-semibold text-[#1f1f1f]">
+              <span className="hidden sm:inline">Tạo dự án mới</span>
+              <span className="sm:hidden">Tạo mới</span>
+            </span>
           </button>
         </div>
       </div>
+
+      {/* Mobile-only secondary bar for project selection */}
+      {projects.length > 0 && (
+        <div className="md:hidden px-4 pb-2.5 pt-0.5 border-t border-[#f1f3f4] bg-[#f8fafd]">
+          <div className="relative w-full flex items-center">
+            <FolderKanban className="absolute left-3 h-3.5 w-3.5 text-[#5f6368]" />
+            <select
+              aria-label="Chọn dự án trên di động"
+              value={selectedProjectId || ""}
+              onChange={(e) => onSelectProject(e.target.value)}
+              className="w-full h-8 pl-8 pr-3 rounded-full bg-white text-xs font-medium text-[#1f1f1f] border border-[#dadce0] focus:border-[#0b57d0] focus:outline-none"
+            >
+              {projects.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.title} ({p.progress_percentage}%)
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

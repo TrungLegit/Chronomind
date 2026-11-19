@@ -22,6 +22,7 @@ import { ExtensionHistoryDrawer } from "@/components/ExtensionHistoryDrawer";
 import { ExportMenu } from "@/components/ExportMenu";
 import { ResumeProjectBanner } from "@/components/ResumeProjectBanner";
 import { GoogleCalendarModal } from "@/components/GoogleCalendarModal";
+import { MobileDeviceSimulator } from "@/components/MobileDeviceSimulator";
 import { api } from "@/services/api";
 import { Project, ProjectSummary, ProjectCreateInput, ExtensionInput } from "@/types";
 
@@ -33,6 +34,7 @@ export default function Home() {
   const [isRescheduleOpen, setIsRescheduleOpen] = useState<boolean>(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState<boolean>(false);
+  const [isMobileSimOpen, setIsMobileSimOpen] = useState<boolean>(false);
   const [recentSession, setRecentSession] = useState<{
     project: any;
     next_task: any;
@@ -155,6 +157,7 @@ export default function Home() {
         selectedProjectId={currentProject?.id || null}
         onSelectProject={(id) => loadProjectDetail(id)}
         onOpenNewProject={() => setIsWizardOpen(true)}
+        onOpenMobileSimulator={() => setIsMobileSimOpen(true)}
       />
 
       <main className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 py-6 space-y-6">
@@ -358,6 +361,11 @@ export default function Home() {
         isOpen={isWizardOpen}
         onClose={() => setIsWizardOpen(false)}
         onSubmit={handleCreateProject}
+      />
+
+      <MobileDeviceSimulator
+        isOpen={isMobileSimOpen}
+        onClose={() => setIsMobileSimOpen(false)}
       />
 
       {currentProject && (
