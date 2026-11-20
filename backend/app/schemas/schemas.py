@@ -119,6 +119,7 @@ class ProjectCreateRequest(BaseModel):
     available_hours_per_week: float = Field(default=10.0, ge=1.0, le=100.0, description="Số giờ rảnh mỗi tuần")
     skill_level: str = Field(default="Intermediate", description="Trình độ hiện tại (Beginner/Intermediate/Advanced)")
     tools_resources: Optional[str] = Field(None, description="Công cụ, máy móc, tài nguyên hiện có")
+    imported_plan: Optional[Any] = Field(None, description="Kế hoạch đã được trích xuất từ file (nếu có)")
 
 class KickOffRequest(BaseModel):
     start_date: Optional[datetime] = None  # defaults to now

@@ -39,6 +39,7 @@ export default function Home() {
   const [isRescheduleOpen, setIsRescheduleOpen] = useState<boolean>(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState<boolean>(false);
+  const [isGoogleConnected, setIsGoogleConnected] = useState<boolean>(false);
   const [recentSession, setRecentSession] = useState<{
     project: any;
     next_task: any;
@@ -58,6 +59,11 @@ export default function Home() {
 
       setProjects(list);
       setBackendConnecting(false);
+
+      // Check Google Calendar connection status
+      api.getGoogleStatus().then((st) => {
+        setIsGoogleConnected(Boolean(st && st.is_connected));
+      }).catch(() => {});
 
       if (session && session.has_recent && session.project) {
         setRecentSession({
@@ -355,6 +361,9 @@ export default function Home() {
                 >
                   <Calendar className="h-4 w-4 text-[#0b57d0]" />
                   <span>Google Calendar</span>
+                  {isGoogleConnected && (
+                    <span className="h-2 w-2 rounded-full bg-[#137333]" title="Tài khoản Google đã kết nối" />
+                  )}
                 </button>
 
                 <ExportMenu projectId={currentProject.id} projectTitle={currentProject.title} />
@@ -513,7 +522,10 @@ export default function Home() {
           <GoogleCalendarModal
             isOpen={isCalendarOpen}
             project={currentProject}
-            onClose={() => setIsCalendarOpen(false)}
+            onClose={() => {
+              setIsCalendarOpen(false);
+              api.getGoogleStatus().then((st) => setIsGoogleConnected(Boolean(st && st.is_connected))).catch(() => {});
+            }}
           />
 
           <RescheduleModal

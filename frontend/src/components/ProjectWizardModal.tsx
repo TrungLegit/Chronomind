@@ -1,7 +1,25 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { X, Clock, Zap, Wrench, Loader2, Sparkles, ArrowRight, RotateCcw } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  X,
+  Clock,
+  Zap,
+  Wrench,
+  Loader2,
+  Sparkles,
+  ArrowRight,
+  RotateCcw,
+  UploadCloud,
+  FileSpreadsheet,
+  FileText,
+  FileCode,
+  CheckCircle2,
+  AlertTriangle,
+  ChevronRight,
+  Layers,
+  FileCheck2,
+} from "lucide-react";
 import { ProjectCreateInput } from "@/types";
 import { api } from "@/services/api";
 
@@ -43,6 +61,7 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
   onClose,
   onSubmit,
 }) => {
+  const [creationMode, setCreationMode] = useState<"ideation" | "import">("ideation");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [targetGoal, setTargetGoal] = useState("");
@@ -52,6 +71,44 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [hasDraft, setHasDraft] = useState(false);
+
+  // File import state
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isParsingFile, setIsParsingFile] = useState(false);
+  const [parseError, setParseError] = useState<string | null>(null);
+  const [parsedPlan, setParsedPlan] = useState<any | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (file: File) => {
+    setSelectedFile(file);
+    setIsParsingFile(true);
+    setParseError(null);
+    setParsedPlan(null);
+
+    try {
+      const result = await api.parsePlanFile(file, hoursPerWeek, skillLevel);
+      setParsedPlan(result);
+      // Auto fill form fields
+      if (result.title) setTitle(result.title);
+      if (result.description) setDescription(result.description);
+      if (result.target_goal) setTargetGoal(result.target_goal);
+      if (result.tools_resources) setToolsResources(result.tools_resources);
+    } catch (err: any) {
+      console.error("Parse plan file error:", err);
+      setParseError(err.message || "Không thể đọc và phân tích file này. Vui lòng thử lại với định dạng .xlsx, .docx hoặc .txt.");
+    } finally {
+      setIsParsingFile(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFileUpload(e.dataTransfer.files[0]);
+    }
+  };
 
   // Load saved draft on open
   useEffect(() => {
@@ -162,12 +219,13 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
 
     try {
       await onSubmit({
-        title,
-        description,
+        title: title.trim(),
+        description: description.trim(),
         target_goal: targetGoal || undefined,
         available_hours_per_week: hoursPerWeek,
         skill_level: skillLevel,
         tools_resources: toolsResources || undefined,
+        imported_plan: parsedPlan?.ai_analysis || undefined,
       });
       clearInterval(interval);
       // Clear draft upon successful project creation
@@ -232,15 +290,241 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
           </div>
         ) : (
           <div>
-            <div className="mb-5 pb-3 border-b border-[#f1f3f4]">
+            <div className="mb-4 pb-3 border-b border-[#f1f3f4]">
               <div className="flex items-center gap-1.5 text-xs font-bold text-[#0b57d0] mb-1">
                 <Sparkles className="h-4 w-4" /> AI FEASIBILITY & TIMELINE PLANNER
               </div>
               <h2 className="text-xl font-bold text-[#1f1f1f]">Khởi Tạo Kế Hoạch Dự Án</h2>
               <p className="text-xs text-[#5f6368] mt-0.5">
-                Nhập ý tưởng sơ bộ. AI sẽ tính độ khó, rủi ro tiềm ẩn và tự động chia nhỏ các giai đoạn.
+                Lập kế hoạch thông minh từ ý tưởng sơ bộ hoặc nhập trực tiếp từ tài liệu Excel, Word đã có sẵn.
               </p>
             </div>
+
+            {/* Segmented Mode Switcher */}
+            <div className="flex rounded-2xl bg-[#f0f4f9] p-1 mb-4">
+              <button
+                type="button"
+                onClick={() => setCreationMode("ideation")}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-xs font-semibold rounded-xl transition-all ${
+                  creationMode === "ideation"
+                    ? "bg-white text-[#0b57d0] shadow-xs"
+                    : "text-[#5f6368] hover:text-[#1f1f1f]"
+                }`}
+              >
+                <Sparkles className="h-4 w-4" />
+                <span>Ý tưởng sơ bộ (AI Planner)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setCreationMode("import")}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-xs font-semibold rounded-xl transition-all ${
+                  creationMode === "import"
+                    ? "bg-white text-[#0b57d0] shadow-xs"
+                    : "text-[#5f6368] hover:text-[#1f1f1f]"
+                }`}
+              >
+                <UploadCloud className="h-4 w-4" />
+                <span>Nhập file kế hoạch có sẵn</span>
+                <span className="rounded-full bg-[#e6f4ea] text-[#137333] px-1.5 py-0.5 text-[10px] font-bold">
+                  Excel / Word
+                </span>
+              </button>
+            </div>
+
+            {/* TAB 2: IMPORT PLAN FROM FILE */}
+            {creationMode === "import" ? (
+              <div className="space-y-4">
+                {/* Drag and drop upload zone */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      handleFileUpload(e.target.files[0]);
+                    }
+                  }}
+                  accept=".xlsx,.xls,.csv,.docx,.txt,.md"
+                  className="hidden"
+                />
+
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragOver(true);
+                  }}
+                  onDragLeave={() => setIsDragOver(false)}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
+                    isDragOver
+                      ? "border-[#0b57d0] bg-[#eaf1fb]"
+                      : "border-[#dadce0] bg-[#f8fafd] hover:bg-[#f0f4f9] hover:border-[#0b57d0]"
+                  }`}
+                >
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-[#dadce0] text-[#0b57d0] shadow-xs mb-3">
+                    <UploadCloud className="h-6 w-6" />
+                  </div>
+                  <h4 className="text-sm font-bold text-[#1f1f1f]">
+                    Kéo thả file kế hoạch vào đây hoặc <span className="text-[#0b57d0] underline">chọn từ máy tính</span>
+                  </h4>
+                  <p className="text-xs text-[#5f6368] mt-1 max-w-sm mx-auto">
+                    Hệ thống sẽ tự động đọc bảng biểu, các Phase, Task, Milestone và số giờ làm từ tài liệu của bạn.
+                  </p>
+
+                  <div className="flex items-center justify-center gap-2 mt-4 flex-wrap">
+                    <span className="inline-flex items-center gap-1 rounded-lg bg-white border border-[#dadce0] px-2.5 py-1 text-[11px] font-medium text-[#1e8e3e]">
+                      <FileSpreadsheet className="h-3.5 w-3.5 text-[#1e8e3e]" />
+                      <span>Excel (.xlsx, .csv)</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-lg bg-white border border-[#dadce0] px-2.5 py-1 text-[11px] font-medium text-[#1a73e8]">
+                      <FileText className="h-3.5 w-3.5 text-[#1a73e8]" />
+                      <span>Word (.docx)</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-lg bg-white border border-[#dadce0] px-2.5 py-1 text-[11px] font-medium text-[#5f6368]">
+                      <FileCode className="h-3.5 w-3.5 text-[#5f6368]" />
+                      <span>Ghi chú (.txt, .md)</span>
+                    </span>
+                  </div>
+                </div>
+
+                {/* Parsing Status Loader */}
+                {isParsingFile && (
+                  <div className="rounded-2xl border border-[#c2e7ff] bg-[#eaf1fb] p-5 text-center space-y-3">
+                    <Loader2 className="h-6 w-6 animate-spin text-[#0b57d0] mx-auto" />
+                    <div>
+                      <h4 className="text-sm font-bold text-[#001d35]">Đang đọc và phân tích tài liệu bằng AI...</h4>
+                      <p className="text-xs text-[#5f6368] mt-0.5">
+                        Trích xuất các giai đoạn, công việc, số giờ và điểm mù từ file {selectedFile?.name}...
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Parse Error Banner */}
+                {parseError && (
+                  <div className="rounded-2xl border border-[#f9dedc] bg-[#fdf2f2] p-4 text-xs text-[#b3261e] flex items-start gap-2.5">
+                    <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                    <div>
+                      <strong>Không thể phân tích file:</strong> {parseError}
+                    </div>
+                  </div>
+                )}
+
+                {/* Parsed Result Card */}
+                {parsedPlan && (
+                  <div className="rounded-2xl border border-[#ceead6] bg-[#f8fafd] p-4 space-y-3.5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#e6f4ea] text-[#137333]">
+                          <FileCheck2 className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-[#1f1f1f]">
+                            {parsedPlan.title || "Kế hoạch đã được trích xuất"}
+                          </h4>
+                          <p className="text-xs text-[#5f6368]">
+                            Từ tệp: <strong>{parsedPlan.file_name}</strong>
+                          </p>
+                        </div>
+                      </div>
+
+                      <span className="rounded-full bg-[#e6f4ea] text-[#137333] border border-[#ceead6] text-[11px] font-bold px-2.5 py-1">
+                        Độ khó: {parsedPlan.ai_analysis?.complexity_score || 6.5}/10
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-[#3c4043] bg-white p-3 rounded-xl border border-[#dadce0] leading-relaxed">
+                      {parsedPlan.description}
+                    </p>
+
+                    {/* Breakdown Metrics */}
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="bg-white p-2 rounded-xl border border-[#dadce0]">
+                        <span className="text-base font-bold text-[#0b57d0]">
+                          {parsedPlan.ai_analysis?.phases?.length || 0}
+                        </span>
+                        <span className="block text-[10px] text-[#5f6368]">Giai đoạn (Phase)</span>
+                      </div>
+                      <div className="bg-white p-2 rounded-xl border border-[#dadce0]">
+                        <span className="text-base font-bold text-[#137333]">
+                          {parsedPlan.ai_analysis?.phases?.reduce(
+                            (acc: number, p: any) => acc + (p.tasks?.length || 0),
+                            0
+                          ) || 0}
+                        </span>
+                        <span className="block text-[10px] text-[#5f6368]">Công việc (Tasks)</span>
+                      </div>
+                      <div className="bg-white p-2 rounded-xl border border-[#dadce0]">
+                        <span className="text-base font-bold text-[#b06000]">
+                          {parsedPlan.ai_analysis?.prerequisites?.length || 0}
+                        </span>
+                        <span className="block text-[10px] text-[#5f6368]">Mục chuẩn bị</span>
+                      </div>
+                    </div>
+
+                    {/* Extracted Phases List Preview */}
+                    <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                      {parsedPlan.ai_analysis?.phases?.map((p: any, idx: number) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between bg-white px-3 py-2 rounded-lg border border-[#e5e7eb] text-xs"
+                        >
+                          <div className="flex items-center gap-2 truncate pr-2">
+                            <span className="font-bold text-[#0b57d0] text-[11px] shrink-0">
+                              Phase {p.phase_number}
+                            </span>
+                            <span className="font-medium text-[#1f1f1f] truncate">{p.title}</span>
+                          </div>
+                          <span className="text-[11px] text-[#5f6368] shrink-0">
+                            {p.tasks?.length || 0} tasks ({p.estimated_hours}h)
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Actions */}
+                    <div className="pt-2 flex items-center justify-between gap-3 border-t border-[#dadce0]">
+                      <button
+                        type="button"
+                        onClick={() => setCreationMode("ideation")}
+                        className="text-xs font-semibold text-[#0b57d0] hover:underline"
+                      >
+                        Chỉnh sửa thêm thông tin &rarr;
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleSubmit}
+                        disabled={loading}
+                        className="flex items-center gap-2 rounded-full bg-[#0b57d0] hover:bg-[#0842a0] text-white px-5 py-2.5 text-xs font-semibold shadow-xs hover:shadow-md transition-all"
+                      >
+                        <CheckCircle2 className="h-4 w-4" />
+                        <span>Tạo Dự Án Ngay Từ File Này</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* TAB 1: MANUAL IDEATION WITH TEMPLATES */
+              <div>
+                {/* Notice if parsed plan is currently active */}
+                {parsedPlan && (
+                  <div className="flex items-center justify-between bg-[#e6f4ea] border border-[#ceead6] text-[#137333] rounded-xl px-3.5 py-2 text-xs mb-4">
+                    <span className="flex items-center gap-1.5 font-medium">
+                      <FileCheck2 className="h-3.5 w-3.5 text-[#137333]" />
+                      <span>Đang áp dụng kế hoạch từ file: <strong>{selectedFile?.name}</strong></span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setParsedPlan(null)}
+                      className="text-[#b3261e] hover:underline font-semibold ml-2 cursor-pointer"
+                    >
+                      Bỏ file
+                    </button>
+                  </div>
+                )}
 
             {/* Auto-saved draft restore notification */}
             {hasDraft && (
@@ -395,6 +679,8 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
           </div>
         )}
       </div>
-    </div>
+    )}
+  </div>
+</div>
   );
 };

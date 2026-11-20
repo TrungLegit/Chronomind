@@ -90,11 +90,15 @@ Backend FastAPI cung cấp đầy đủ các API chuẩn RESTful cho việc phâ
 
 ## 🌟 TÍNH NĂNG CỐT LÕI (CORE FEATURES)
 
-### 1. 🧠 AI Phân Tích Độ Khó & Cảnh Báo Điểm Mù (Feasibility Analyzer)
+### 1. 🧠 AI Phân Tích Độ Khó & Lập Kế Hoạch Động 2.0 (Deep Engineering Architecture)
 * **Đầu vào linh hoạt:** Người dùng chỉ cần nhập mô tả ý tưởng (dù sơ khai), mục tiêu đầu ra, số giờ rảnh mỗi tuần (5h - 40h), và trình độ hiện tại.
-* **Chấm điểm độ khó (1.0 - 10.0):** Phân loại dự án (Hardware IoT, AI/ML, Fullstack Web, Business) và đưa ra điểm số kèm nhận định chuyên môn.
-* **Cảnh báo Điểm mù (Blind Spots):** Nhắc nhở những điều người dùng "chưa hình dung tới" (VD: thời gian chờ giao linh kiện, debug và xử lý ngoại lệ chiếm 30-40% thời gian, sụt áp nguồn/nhiễu EMI, độ trễ API LLM...).
-* **Checklist Chuẩn bị (Prerequisites):** Liệt kê danh mục chuẩn bị rõ ràng theo: *Kiến thức (Knowledge), Phần cứng (Hardware), Môi trường (Dev-Env), Tài nguyên (Resource)* cần hoàn tất trước khi bắt tay làm thật.
+* **Chấm điểm độ khó (1.0 - 10.0):** Phân loại chuyên sâu (Hardware IoT, AI/ML, Fullstack Web, Deeptech R&D) và đưa ra điểm số kèm nhận định kiến trúc chuyên môn.
+* **Cảnh báo Điểm mù & Rủi ro tiềm ẩn (Blind Spots & Hidden Gotchas):** Nhắc nhở những điều người làm thường bỏ sót (thời gian đặt hàng linh kiện, gỡ lỗi chiếm 30-40% thời gian thực tế, sụt áp nguồn/nhiễu EMI, chi phí token & rate limit API LLM, schema migration bế tắc...).
+* **Hệ số Đệm an toàn (Anti-Parkinson Safety Buffer):** Tự động phân bổ đệm an toàn 15-20% vào lộ trình để khắc phục định luật Parkinson và bảo đảm tính khả thi của deadline.
+* **Hành động Kích hoạt ngay (<24h Action Step):** Luôn có 1 task khởi động nhanh trong 24 giờ đầu tiên để phá vỡ sự trì hoãn và tạo đà tâm lý bắt tay vào làm.
+* **Checklist Chuẩn bị (Prerequisites):** Liệt kê danh mục chuẩn bị rõ ràng theo 4 nhóm: *Kiến thức (KNOWLEDGE), Thiết bị (EQUIPMENT), Môi trường (ENVIRONMENT), Tài nguyên (RESOURCE)* cần hoàn tất trước khi bắt tay làm thật.
+* **Nhập Kế hoạch từ File có sẵn (Excel / Word / Docs / Markdown):** Cho phép người dùng kéo thả hoặc tải lên file kế hoạch đã lập từ trước (như bảng tính Excel `.xlsx`, `.csv`, văn bản Word `.docx`, hoặc file ghi chú `.txt`, `.md`). Hệ thống AI sẽ tự động đọc nội dung bảng biểu, bóc tách các Giai đoạn (Phase), Công việc (Task), Cột mốc (Milestone ⭐) và số giờ làm để chuyển hóa thành kế hoạch Chronomind ngay lập tức mà không cần gõ lại từ đầu.
+* **Bộ sinh Kế hoạch Heuristic Offline 100%:** Ngay cả khi không có kết nối mạng hoặc chưa cấu hình API key, hệ thống vẫn tự động sinh ra lộ trình mẫu chi tiết, chuẩn ngành kỹ thuật với dữ liệu thực tế thay vì các đoạn text giả lập.
 
 ### 2. ⏱️ Kích Hoạt Thông Minh & Deadline Động (Smart Trigger & Dynamic Phasing)
 * **Chế độ Chờ Chuẩn Bị (Preparation Mode):** Đồng hồ đếm ngược **CHƯA** chạy ngay khi tạo dự án. Người dùng thoải mái chuẩn bị đồ đạc và tick vào checklist.
@@ -117,11 +121,11 @@ Backend FastAPI cung cấp đầy đủ các API chuẩn RESTful cho việc phâ
   * **Xuất file iCalendar (`.ics`):** Tạo file lịch chuẩn quốc tế RFC 5545 chứa toàn bộ Phase và Milestone. Nhấp đúp để import ngay vào Google Calendar, Apple Calendar, Outlook.
   * **1-Click Web Template:** Mở ngay màn hình tạo sự kiện trên Google Calendar với tiêu đề, ngày giờ và mô tả công việc đã điền sẵn cho từng Phase.
 * **Tầng 2 (Nâng cao / Đồng bộ 2 chiều tự động qua Google Calendar API):**
-  * **Hướng dẫn trực quan từng bước:** Modal tích hợp hướng dẫn 5 bước chi tiết kèm đường dẫn trực tiếp đến Google Cloud Console và nút **Sao chép 1-Click Redirect URI**.
+  * **Hướng dẫn trực quan từng bước:** Modal tích hợp hướng dẫn 5 bước chi tiết kèm đường dẫn trực tiếp đến Google Cloud Console, kiểm tra định dạng Client ID trực quan và nút **Sao chép 1-Click Redirect URI**.
   * **Trích xuất tự động từ file:** Cho phép dán trực tiếp toàn bộ nội dung file `credentials.json` để hệ thống tự động bóc tách Client ID và Client Secret.
   * **Lịch dự án riêng biệt:** Tự động tạo và quản lý lịch riêng `Chronomind: [Tên dự án]` trên tài khoản Google của bạn.
   * **Đồng bộ thông minh (Upsert theo Deterministic ID):** Khi bạn lùi deadline hoặc dời ngày trong Chronomind, bấm nút **"Đồng bộ ngay"** sẽ tự động dịch chuyển ngày giờ của các sự kiện tương ứng trên Google Calendar thay vì tạo sự kiện mới trùng lặp!
-  * **Tự động làm mới Token:** Quản lý `access_token` và tự động refresh token trong nền, không làm gián đoạn trải nghiệm người dùng.
+  * **Tự động làm mới Token:** Quản lý `access_token` và tự động refresh token trong nền, hiển thị huy hiệu trạng thái kết nối trực tiếp trên thanh công cụ.
 
 ### 6. 📑 Xuất Báo Cáo Chuyên Nghiệp (Excel, Word & Lịch .ics)
 * **Xuất file Excel (`.xlsx` qua `openpyxl`):**
@@ -130,17 +134,14 @@ Backend FastAPI cung cấp đầy đủ các API chuẩn RESTful cho việc phâ
   - **Sheet 3 (Extension History):** Nhật ký gia hạn, số ngày đã lùi và phân tích từ AI.
 * **Xuất file Word (`.docx` qua `python-docx`):** Bản báo cáo tình trạng dự án chuẩn chỉnh gồm: Tóm tắt dự án, Đánh giá độ khó ban đầu, Danh sách điểm mù, Bảng tiến độ từng Phase, và Nhật ký sự cố.
 
-### 7. 📱 Tương Thích Di Động Toàn Diện & Trình Giả Lập Viewport (Mobile Simulator)
-* **Trình giả lập màn hình trực quan (Interactive Mobile Simulator):**
-  * Tích hợp sẵn thanh công cụ giả lập kiểm tra tỉ lệ màn hình của tất cả các dòng thiết bị phổ biến trên thị trường:
-    * 🍏 **Apple iOS:** iPhone 16/15 Pro Max (`430x932`, 19.5:9, Dynamic Island), iPhone 16/15/14 (`393x852`), iPhone 13/12 (`390x844`), iPhone SE (`375x667`, 16:9), iPad Mini (`768x1024`, 4:3).
-    * 🤖 **Google Android:** Samsung Galaxy S24 Ultra (`412x915`, 20:9, góc vuông), Google Pixel 9/8 Pro (`412x892`), Xiaomi 14 (`393x873`), Android Phổ thông (`360x800`), Android Compact (`360x640`).
-    * 🔄 **Foldables & Dual-Screen:** Samsung Galaxy Z Fold 5 (Màn ngoài `344x904` siêu hẹp 23.1:9, Màn mở gập `768x904` gần vuông 10.6:9), Galaxy Z Flip 5 (`412x1004`, 22:9), Microsoft Surface Duo / iPhone Duo Style (`1114x720`, 2 màn hình kép có bản lề giữa).
-  * Hỗ trợ xoay ngang/dọc (**Rotate 🔄 Portrait / Landscape**) và zoom co giãn (**50% - 100% / Fit**).
-* **Quét mã QR mở trực tiếp trên Điện thoại thật (Wi-Fi Local):**
-  * Tự động phát hiện địa chỉ IP Wi-Fi nội bộ (`http://192.168.x.x:3000`).
-  * Chỉ cần mở Camera điện thoại quét mã QR là có thể sử dụng ngay lập tức mà không cần cài đặt.
-  * Hỗ trợ **PWA (Add to Home Screen)** trên Safari và Chrome để chạy mượt mà như app native toàn màn hình.
+### 7. 📱 Thích Ứng Thiết Bị Thực Tế Thông Minh (Native Device Adaptive Engine)
+* **Tự động nhận diện thiết bị thực tế theo thời gian thực (Zero-Configuration Responsive):**
+  * Thay vì dùng thanh mô phỏng giả lập cồng kềnh, Chronomind tích hợp hook `useDeviceAdaptive` để tự động biến đổi giao diện theo đúng màn hình và tỉ lệ của thiết bị bạn đang cầm:
+    * 🔄 **Màn hình gập Samsung Galaxy Z Fold (Cover Screen ~344px):** Tự động thu gọn giao diện thành layout 1 cột thanh mảnh, tối ưu padding và kích cỡ chữ, bảo đảm không bao giờ bị tràn ngang màn hình.
+    * 📖 **Màn hình gập khi mở ra (Z Fold Unfolded ~768px-900px) & Máy 2 màn hình (Surface Duo / iPhone Duo):** Tự động kích hoạt bố cục **Dual-Pane Split Screen (2 màn hình song song có đường chia bản lề hinge)**:
+      * *Màn hình 1 (Trái):* Thẻ KPI độ khó, nhận định kiến trúc và Checklist việc cần chuẩn bị.
+      * *Màn hình 2 (Phải):* Thanh tiến độ tổng quan & Biểu đồ Gantt trực quan.
+    * 📱 **Điện thoại thông thường (Apple iOS & Android):** Thiết kế tối ưu cho ngón tay cái (Thumb-friendly), thanh điều hướng gọn nhẹ và nút bấm **Floating Action Button (FAB) dấu cộng 4 màu Google Workspace** ở góc dưới bên phải màn hình.
 
 ---
 

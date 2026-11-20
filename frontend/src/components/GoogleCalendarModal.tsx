@@ -520,9 +520,16 @@ export const GoogleCalendarModal: React.FC<GoogleCalendarModalProps> = ({
                     ) : (
                       <div className="space-y-3">
                         <div className="space-y-1">
-                          <label className="text-[11px] font-semibold text-[#5f6368] block">
-                            Client ID:
-                          </label>
+                          <div className="flex items-center justify-between">
+                            <label className="text-[11px] font-semibold text-[#5f6368] block">
+                              Client ID:
+                            </label>
+                            {clientId.includes(".apps.googleusercontent.com") && (
+                              <span className="text-[10px] text-[#137333] font-semibold flex items-center gap-1">
+                                <Check className="h-3 w-3" /> Định dạng Client ID hợp lệ
+                              </span>
+                            )}
+                          </div>
                           <input
                             type="text"
                             value={clientId}
@@ -533,9 +540,16 @@ export const GoogleCalendarModal: React.FC<GoogleCalendarModalProps> = ({
                         </div>
 
                         <div className="space-y-1">
-                          <label className="text-[11px] font-semibold text-[#5f6368] block">
-                            Client Secret:
-                          </label>
+                          <div className="flex items-center justify-between">
+                            <label className="text-[11px] font-semibold text-[#5f6368] block">
+                              Client Secret:
+                            </label>
+                            {clientSecret.trim().length >= 10 && (
+                              <span className="text-[10px] text-[#137333] font-semibold flex items-center gap-1">
+                                <Check className="h-3 w-3" /> Đã nhập Secret
+                              </span>
+                            )}
+                          </div>
                           <input
                             type="password"
                             value={clientSecret}
@@ -543,6 +557,14 @@ export const GoogleCalendarModal: React.FC<GoogleCalendarModalProps> = ({
                             placeholder="GOCSPX-xxxxxxxxxxxxxxxx"
                             className="w-full text-xs p-2.5 rounded-xl border border-[#dadce0] focus:border-[#0b57d0] focus:ring-1 focus:ring-[#0b57d0] outline-none font-mono"
                           />
+                        </div>
+
+                        {/* Helper tip banner */}
+                        <div className="rounded-xl bg-[#f0f4f9] p-3 text-[11px] text-[#444746] flex items-start gap-2 border border-[#dadce0]">
+                          <Sparkles className="h-4 w-4 text-[#0b57d0] shrink-0 mt-0.5" />
+                          <div className="leading-relaxed">
+                            <strong>Mẹo tiết kiệm thời gian:</strong> Nếu không muốn tạo dự án trên Google Cloud, bạn chỉ cần chuyển sang tab <strong>"Thêm nhanh (1-Click / .ics)"</strong> để tải file hoặc đẩy từng giai đoạn lên Google Calendar ngay tức thì với 0 bước cài đặt!
+                          </div>
                         </div>
                       </div>
                     )}

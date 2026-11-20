@@ -108,6 +108,7 @@ export interface ProjectCreateInput {
   available_hours_per_week: number;
   skill_level: string;
   tools_resources?: string;
+  imported_plan?: any;
 }
 
 export interface ExtensionInput {

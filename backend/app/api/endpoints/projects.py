@@ -1,7 +1,8 @@
 import json
+import logging
 from datetime import datetime
-from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import List, Optional, Any
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.models import (
@@ -15,9 +16,13 @@ from app.schemas.schemas import (
     KickOffRequest,
     ExtensionRequest,
     ExtensionLogOut,
+    AIAnalysisResult,
 )
 from app.services.ai_engine import AIEngine
 from app.services.scheduler import DeadlineScheduler
+from app.services.plan_importer import PlanImporterService
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -55,16 +60,23 @@ async def create_project(req: ProjectCreateRequest, db: Session = Depends(get_db
     """
     Core Feature 1: AI Feasibility & Complexity Analyzer.
     Analyzes project scope, scores complexity, generates blind spots, prerequisites, and phases.
+    Can also directly ingest an imported plan (from Excel, Word, or text).
     Starts in PREPARATION mode (deadlines do not tick yet).
     """
-    ai_result = await AIEngine.analyze_project(
-        title=req.title,
-        description=req.description,
-        target_goal=req.target_goal,
-        available_hours_per_week=req.available_hours_per_week,
-        skill_level=req.skill_level,
-        tools_resources=req.tools_resources
-    )
+    if req.imported_plan:
+        if isinstance(req.imported_plan, dict):
+            ai_result = AIAnalysisResult(**req.imported_plan)
+        else:
+            ai_result = req.imported_plan
+    else:
+        ai_result = await AIEngine.analyze_project(
+            title=req.title,
+            description=req.description,
+            target_goal=req.target_goal,
+            available_hours_per_week=req.available_hours_per_week,
+            skill_level=req.skill_level,
+            tools_resources=req.tools_resources
+        )
 
     project = Project(
         title=req.title,
@@ -382,6 +394,29 @@ def get_network_info():
         "backend_port": 8000,
         "mobile_url": f"http://{local_ip}:3000"
     }
+
+@router.post("/parse-plan-file")
+async def parse_plan_file(
+    file: UploadFile = File(...),
+    available_hours_per_week: float = Form(12.0),
+    skill_level: str = Form("Intermediate"),
+):
+    """
+    Parses an uploaded project plan file (Excel, Word, Text, Markdown)
+    and uses AI/heuristics to structure it into Chronomind's project format.
+    """
+    try:
+        content = await file.read()
+        return await PlanImporterService.parse_plan_file(
+            file_bytes=content,
+            filename=file.filename or "plan.xlsx",
+            available_hours_per_week=available_hours_per_week,
+            skill_level=skill_level,
+        )
+    except Exception as e:
+        logger.error(f"Error parsing plan file: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+
 
 
 

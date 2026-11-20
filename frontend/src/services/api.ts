@@ -54,6 +54,23 @@ export const api = {
     return res.json();
   },
 
+  async parsePlanFile(file: File, availableHours = 12, skillLevel = "Intermediate"): Promise<any> {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("available_hours_per_week", availableHours.toString());
+    formData.append("skill_level", skillLevel);
+
+    const res = await fetch(`${getBaseUrl()}/projects/parse-plan-file`, {
+      method: "POST",
+      body: formData,
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || "Không thể phân tích file kế hoạch.");
+    }
+    return res.json();
+  },
+
   async deleteProject(id: string): Promise<void> {
     const res = await fetch(`${getBaseUrl()}/projects/${id}`, {
       method: "DELETE",
