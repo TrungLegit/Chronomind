@@ -19,6 +19,10 @@ import {
   ChevronRight,
   Layers,
   FileCheck2,
+  FolderUp,
+  FolderArchive,
+  Trash2,
+  Plus,
 } from "lucide-react";
 import { ProjectCreateInput } from "@/types";
 import { api } from "@/services/api";
@@ -72,22 +76,66 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
   const [loadingStep, setLoadingStep] = useState(0);
   const [hasDraft, setHasDraft] = useState(false);
 
-  // File import state
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  // File import state (supports multiple files, folders, and .zip)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isParsingFile, setIsParsingFile] = useState(false);
   const [parseError, setParseError] = useState<string | null>(null);
   const [parsedPlan, setParsedPlan] = useState<any | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const folderInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = async (file: File) => {
-    setSelectedFile(file);
-    setIsParsingFile(true);
+  const isSupportedFile = (file: File) => {
+    const ext = file.name.toLowerCase();
+    return (
+      ext.endsWith(".xlsx") ||
+      ext.endsWith(".xls") ||
+      ext.endsWith(".csv") ||
+      ext.endsWith(".docx") ||
+      ext.endsWith(".txt") ||
+      ext.endsWith(".md") ||
+      ext.endsWith(".zip") ||
+      ext.endsWith(".json")
+    );
+  };
+
+  const handleFilesAdded = (incoming: FileList | File[]) => {
+    const valid: File[] = [];
+    const list = Array.from(incoming);
+    for (const f of list) {
+      if (isSupportedFile(f) && !selectedFiles.some((ex) => ex.name === f.name && ex.size === f.size)) {
+        valid.push(f);
+      }
+    }
+    if (valid.length === 0 && list.length > 0) {
+      setParseError("Không tìm thấy tệp hợp lệ (.xlsx, .docx, .csv, .txt, .md, .zip). Vui lòng kiểm tra lại định dạng tệp.");
+      return;
+    }
+    const updated = [...selectedFiles, ...valid];
+    setSelectedFiles(updated);
     setParseError(null);
     setParsedPlan(null);
+    // Automatically trigger analysis for seamless experience
+    executeAnalysis(updated);
+  };
+
+  const handleRemoveFile = (index: number) => {
+    const updated = selectedFiles.filter((_, i) => i !== index);
+    setSelectedFiles(updated);
+    if (updated.length === 0) {
+      setParsedPlan(null);
+    } else {
+      executeAnalysis(updated);
+    }
+  };
+
+  const executeAnalysis = async (filesToAnalyze: File[]) => {
+    if (!filesToAnalyze || filesToAnalyze.length === 0) return;
+    setIsParsingFile(true);
+    setParseError(null);
 
     try {
-      const result = await api.parsePlanFile(file, hoursPerWeek, skillLevel);
+      const result = await api.parsePlanFiles(filesToAnalyze, hoursPerWeek, skillLevel);
       setParsedPlan(result);
       // Auto fill form fields
       if (result.title) setTitle(result.title);
@@ -96,7 +144,7 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
       if (result.tools_resources) setToolsResources(result.tools_resources);
     } catch (err: any) {
       console.error("Parse plan file error:", err);
-      setParseError(err.message || "Không thể đọc và phân tích file này. Vui lòng thử lại với định dạng .xlsx, .docx hoặc .txt.");
+      setParseError(err.message || "Không thể phân tích các tệp đã tải lên. Vui lòng thử lại.");
     } finally {
       setIsParsingFile(false);
     }
@@ -106,7 +154,7 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
     e.preventDefault();
     setIsDragOver(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      handleFileUpload(e.dataTransfer.files[0]);
+      handleFilesAdded(e.dataTransfer.files);
     }
   };
 
@@ -332,22 +380,37 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
               </button>
             </div>
 
-            {/* TAB 2: IMPORT PLAN FROM FILE */}
+            {/* TAB 2: IMPORT PLAN FROM FILE(S) OR FOLDER */}
             {creationMode === "import" ? (
               <div className="space-y-4">
-                {/* Drag and drop upload zone */}
+                {/* Hidden File and Folder Inputs */}
                 <input
                   type="file"
                   ref={fileInputRef}
+                  multiple
                   onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      handleFileUpload(e.target.files[0]);
+                    if (e.target.files && e.target.files.length > 0) {
+                      handleFilesAdded(e.target.files);
                     }
                   }}
-                  accept=".xlsx,.xls,.csv,.docx,.txt,.md"
+                  accept=".xlsx,.xls,.csv,.docx,.txt,.md,.zip,.json"
                   className="hidden"
                 />
 
+                <input
+                  type="file"
+                  ref={folderInputRef}
+                  multiple
+                  {...({ webkitdirectory: "", directory: "" } as any)}
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      handleFilesAdded(e.target.files);
+                    }
+                  }}
+                  className="hidden"
+                />
+
+                {/* Drag & Drop Zone */}
                 <div
                   onDragOver={(e) => {
                     e.preventDefault();
@@ -355,23 +418,44 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
                   }}
                   onDragLeave={() => setIsDragOver(false)}
                   onDrop={handleDrop}
-                  onClick={() => fileInputRef.current?.click()}
-                  className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
+                  className={`border-2 border-dashed rounded-2xl p-6 text-center transition-all ${
                     isDragOver
                       ? "border-[#0b57d0] bg-[#eaf1fb]"
-                      : "border-[#dadce0] bg-[#f8fafd] hover:bg-[#f0f4f9] hover:border-[#0b57d0]"
+                      : "border-[#dadce0] bg-[#f8fafd] hover:bg-[#f0f4f9]"
                   }`}
                 >
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-[#dadce0] text-[#0b57d0] shadow-xs mb-3">
                     <UploadCloud className="h-6 w-6" />
                   </div>
                   <h4 className="text-sm font-bold text-[#1f1f1f]">
-                    Kéo thả file kế hoạch vào đây hoặc <span className="text-[#0b57d0] underline">chọn từ máy tính</span>
+                    Kéo thả nhiều file, file nén (.zip) hoặc cả thư mục vào đây
                   </h4>
                   <p className="text-xs text-[#5f6368] mt-1 max-w-sm mx-auto">
-                    Hệ thống sẽ tự động đọc bảng biểu, các Phase, Task, Milestone và số giờ làm từ tài liệu của bạn.
+                    Hệ thống sẽ tự động đọc, gộp và tổng hợp các Phase, Task, Milestone từ toàn bộ tài liệu của bạn thành 1 kế hoạch duy nhất.
                   </p>
 
+                  {/* 2 Primary Selection Buttons */}
+                  <div className="flex items-center justify-center gap-2.5 mt-4">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex items-center gap-1.5 rounded-full bg-[#0b57d0] hover:bg-[#0842a0] text-white px-4 py-2 text-xs font-semibold shadow-xs transition-all"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      <span>Chọn file(s) / .ZIP</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => folderInputRef.current?.click()}
+                      className="flex items-center gap-1.5 rounded-full border border-[#dadce0] bg-white hover:bg-[#f0f4f9] text-[#1f1f1f] px-4 py-2 text-xs font-semibold shadow-xs transition-all"
+                    >
+                      <FolderUp className="h-3.5 w-3.5 text-[#0b57d0]" />
+                      <span>Chọn cả Thư mục (Folder)</span>
+                    </button>
+                  </div>
+
+                  {/* Badges */}
                   <div className="flex items-center justify-center gap-2 mt-4 flex-wrap">
                     <span className="inline-flex items-center gap-1 rounded-lg bg-white border border-[#dadce0] px-2.5 py-1 text-[11px] font-medium text-[#1e8e3e]">
                       <FileSpreadsheet className="h-3.5 w-3.5 text-[#1e8e3e]" />
@@ -381,6 +465,10 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
                       <FileText className="h-3.5 w-3.5 text-[#1a73e8]" />
                       <span>Word (.docx)</span>
                     </span>
+                    <span className="inline-flex items-center gap-1 rounded-lg bg-white border border-[#dadce0] px-2.5 py-1 text-[11px] font-medium text-[#9333ea]">
+                      <FolderArchive className="h-3.5 w-3.5 text-[#9333ea]" />
+                      <span>Thư mục nén (.zip)</span>
+                    </span>
                     <span className="inline-flex items-center gap-1 rounded-lg bg-white border border-[#dadce0] px-2.5 py-1 text-[11px] font-medium text-[#5f6368]">
                       <FileCode className="h-3.5 w-3.5 text-[#5f6368]" />
                       <span>Ghi chú (.txt, .md)</span>
@@ -388,14 +476,73 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
                   </div>
                 </div>
 
+                {/* Selected Files Chips List */}
+                {selectedFiles.length > 0 && (
+                  <div className="bg-white rounded-2xl border border-[#dadce0] p-3.5 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#1f1f1f] flex items-center gap-1.5">
+                        <FolderUp className="h-4 w-4 text-[#0b57d0]" />
+                        <span>Danh sách tài liệu đã chọn ({selectedFiles.length} tệp):</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedFiles([])}
+                        className="text-[11px] text-[#b3261e] hover:underline font-medium"
+                      >
+                        Xóa tất cả
+                      </button>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto p-1">
+                      {selectedFiles.map((f, idx) => {
+                        const ext = f.name.toLowerCase();
+                        let IconComponent = FileCode;
+                        let iconColor = "text-[#5f6368]";
+                        if (ext.endsWith(".xlsx") || ext.endsWith(".csv")) {
+                          IconComponent = FileSpreadsheet;
+                          iconColor = "text-[#1e8e3e]";
+                        } else if (ext.endsWith(".docx")) {
+                          IconComponent = FileText;
+                          iconColor = "text-[#1a73e8]";
+                        } else if (ext.endsWith(".zip")) {
+                          IconComponent = FolderArchive;
+                          iconColor = "text-[#9333ea]";
+                        }
+
+                        const sizeKb = Math.round(f.size / 1024) || 1;
+
+                        return (
+                          <div
+                            key={idx}
+                            className="inline-flex items-center gap-1.5 bg-[#f8fafd] border border-[#dadce0] rounded-xl px-2.5 py-1.5 text-xs text-[#1f1f1f] max-w-xs truncate"
+                          >
+                            <IconComponent className={`h-3.5 w-3.5 shrink-0 ${iconColor}`} />
+                            <span className="truncate font-medium">{f.name}</span>
+                            <span className="text-[10px] text-[#5f6368] shrink-0">({sizeKb} KB)</span>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveFile(idx)}
+                              className="h-4 w-4 rounded-full flex items-center justify-center text-[#5f6368] hover:bg-[#fad2cf] hover:text-[#b3261e] shrink-0 ml-1 transition-colors"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 {/* Parsing Status Loader */}
                 {isParsingFile && (
                   <div className="rounded-2xl border border-[#c2e7ff] bg-[#eaf1fb] p-5 text-center space-y-3">
                     <Loader2 className="h-6 w-6 animate-spin text-[#0b57d0] mx-auto" />
                     <div>
-                      <h4 className="text-sm font-bold text-[#001d35]">Đang đọc và phân tích tài liệu bằng AI...</h4>
+                      <h4 className="text-sm font-bold text-[#001d35]">
+                        Đang đọc và tổng hợp {selectedFiles.length} tài liệu bằng AI...
+                      </h4>
                       <p className="text-xs text-[#5f6368] mt-0.5">
-                        Trích xuất các giai đoạn, công việc, số giờ và điểm mù từ file {selectedFile?.name}...
+                        Tự động đồng bộ hóa các Phase, Task, Milestone và loại bỏ trùng lặp...
                       </p>
                     </div>
                   </div>
@@ -424,12 +571,12 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
                             {parsedPlan.title || "Kế hoạch đã được trích xuất"}
                           </h4>
                           <p className="text-xs text-[#5f6368]">
-                            Từ tệp: <strong>{parsedPlan.file_name}</strong>
+                            Đã tổng hợp từ: <strong>{parsedPlan.total_files_count || selectedFiles.length} tệp tài liệu</strong>
                           </p>
                         </div>
                       </div>
 
-                      <span className="rounded-full bg-[#e6f4ea] text-[#137333] border border-[#ceead6] text-[11px] font-bold px-2.5 py-1">
+                      <span className="rounded-full bg-[#e6f4ea] text-[#137333] border border-[#ceead6] text-[11px] font-bold px-2.5 py-1 shrink-0">
                         Độ khó: {parsedPlan.ai_analysis?.complexity_score || 6.5}/10
                       </span>
                     </div>
@@ -514,11 +661,16 @@ export const ProjectWizardModal: React.FC<ProjectWizardModalProps> = ({
                   <div className="flex items-center justify-between bg-[#e6f4ea] border border-[#ceead6] text-[#137333] rounded-xl px-3.5 py-2 text-xs mb-4">
                     <span className="flex items-center gap-1.5 font-medium">
                       <FileCheck2 className="h-3.5 w-3.5 text-[#137333]" />
-                      <span>Đang áp dụng kế hoạch từ file: <strong>{selectedFile?.name}</strong></span>
+                      <span>
+                        Đang áp dụng kế hoạch từ {selectedFiles.length > 1 ? `${selectedFiles.length} tệp tài liệu` : (selectedFiles[0]?.name || "tài liệu kế hoạch")}
+                      </span>
                     </span>
                     <button
                       type="button"
-                      onClick={() => setParsedPlan(null)}
+                      onClick={() => {
+                        setParsedPlan(null);
+                        setSelectedFiles([]);
+                      }}
                       className="text-[#b3261e] hover:underline font-semibold ml-2 cursor-pointer"
                     >
                       Bỏ file

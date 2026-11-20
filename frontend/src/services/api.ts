@@ -54,9 +54,12 @@ export const api = {
     return res.json();
   },
 
-  async parsePlanFile(file: File, availableHours = 12, skillLevel = "Intermediate"): Promise<any> {
+  async parsePlanFiles(files: File | File[], availableHours = 12, skillLevel = "Intermediate"): Promise<any> {
     const formData = new FormData();
-    formData.append("file", file);
+    const fileArray = Array.isArray(files) ? files : [files];
+    for (const f of fileArray) {
+      formData.append("files", f);
+    }
     formData.append("available_hours_per_week", availableHours.toString());
     formData.append("skill_level", skillLevel);
 
@@ -66,9 +69,13 @@ export const api = {
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.detail || "Không thể phân tích file kế hoạch.");
+      throw new Error(err.detail || "Không thể phân tích các file kế hoạch.");
     }
     return res.json();
+  },
+
+  async parsePlanFile(file: File, availableHours = 12, skillLevel = "Intermediate"): Promise<any> {
+    return this.parsePlanFiles([file], availableHours, skillLevel);
   },
 
   async deleteProject(id: string): Promise<void> {

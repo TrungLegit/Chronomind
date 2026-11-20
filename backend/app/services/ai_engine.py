@@ -314,8 +314,17 @@ Hãy đọc kỹ tài liệu kế hoạch trên, giữ nguyên các đầu việ
         active_phase = "Phase 1: Khởi động & Khảo sát"
 
         for line in lines:
-            # Skip pure table header rows like "Giai đoạn | Công việc | Thời lượng"
             lower_line = line.lower()
+            # Skip delimiter rows and metadata banners
+            if line.startswith(("===", "---", "___")) or "tài liệu nguồn:" in lower_line or "[tệp con" in lower_line or "tệp nén / thư mục:" in lower_line:
+                if any(p in lower_line for p in ["phase", "giai đoạn", "chương", "phần", "module", "step", "bước", "đợt", "tuần", "week"]):
+                    active_phase = line.lstrip("#- =_").strip()
+                    if active_phase not in phase_buckets:
+                        phase_buckets[active_phase] = []
+                        phase_order.append(active_phase)
+                continue
+
+            # Skip pure table header rows like "Giai đoạn | Công việc | Thời lượng"
             if any(h in lower_line for h in ["sheet:", "bảng tính", "bảng 1", "bảng 2", "bảng 3"]):
                 continue
             if ("công việc" in lower_line or "task" in lower_line) and ("thời lượng" in lower_line or "hours" in lower_line or "duration" in lower_line):

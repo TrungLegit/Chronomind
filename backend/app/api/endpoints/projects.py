@@ -397,24 +397,31 @@ def get_network_info():
 
 @router.post("/parse-plan-file")
 async def parse_plan_file(
-    file: UploadFile = File(...),
+    files: List[UploadFile] = File(...),
     available_hours_per_week: float = Form(12.0),
     skill_level: str = Form("Intermediate"),
 ):
     """
-    Parses an uploaded project plan file (Excel, Word, Text, Markdown)
-    and uses AI/heuristics to structure it into Chronomind's project format.
+    Parses one or multiple uploaded project plan files (Excel, Word, Text, Markdown, ZIP),
+    or files from an uploaded folder, and uses AI/heuristics to synthesize them into Chronomind.
     """
     try:
-        content = await file.read()
-        return await PlanImporterService.parse_plan_file(
-            file_bytes=content,
-            filename=file.filename or "plan.xlsx",
+        file_payloads = []
+        for f in files:
+            content = await f.read()
+            if content:
+                file_payloads.append((content, f.filename or "plan_file"))
+
+        if not file_payloads:
+            raise HTTPException(status_code=400, detail="Chưa có file nào được tải lên.")
+
+        return await PlanImporterService.parse_multiple_files(
+            files=file_payloads,
             available_hours_per_week=available_hours_per_week,
             skill_level=skill_level,
         )
     except Exception as e:
-        logger.error(f"Error parsing plan file: {e}")
+        logger.error(f"Error parsing plan file(s): {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
 
