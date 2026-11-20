@@ -129,6 +129,10 @@ export const api = {
     return `${getBaseUrl()}/projects/${id}/export/ics`;
   },
 
+  getExportNotebookLMUrl(id: string): string {
+    return `${getBaseUrl()}/projects/${id}/export/notebooklm`;
+  },
+
   // Google Calendar Integration APIs
   async getGoogleStatus(): Promise<{
     is_configured: boolean;

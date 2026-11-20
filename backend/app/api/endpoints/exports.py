@@ -9,6 +9,7 @@ from app.models.models import Project
 from app.services.exporter_excel import ExcelExporter
 from app.services.exporter_word import WordExporter
 from app.services.exporter_ics import IcsExporter
+from app.services.exporter_notebooklm import NotebookLMExporter
 
 router = APIRouter()
 
@@ -65,5 +66,20 @@ def export_ics(project_id: str, db: Session = Depends(get_db)):
     return Response(
         content=stream.getvalue(),
         media_type="text/calendar; charset=utf-8",
+        headers={"Content-Disposition": make_content_disposition(filename)}
+    )
+
+@router.get("/{project_id}/export/notebooklm")
+def export_notebooklm(project_id: str, db: Session = Depends(get_db)):
+    project = db.query(Project).filter(Project.id == project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    content = NotebookLMExporter.generate_project_markdown(project)
+    filename = f"Chronomind_{clean_filename_ascii(project.title)}_NotebookLM_Source.md"
+
+    return Response(
+        content=content.encode("utf-8"),
+        media_type="text/markdown; charset=utf-8",
         headers={"Content-Disposition": make_content_disposition(filename)}
     )

@@ -127,12 +127,14 @@ Backend FastAPI cung cấp đầy đủ các API chuẩn RESTful cho việc phâ
   * **Đồng bộ thông minh (Upsert theo Deterministic ID):** Khi bạn lùi deadline hoặc dời ngày trong Chronomind, bấm nút **"Đồng bộ ngay"** sẽ tự động dịch chuyển ngày giờ của các sự kiện tương ứng trên Google Calendar thay vì tạo sự kiện mới trùng lặp!
   * **Tự động làm mới Token:** Quản lý `access_token` và tự động refresh token trong nền, hiển thị huy hiệu trạng thái kết nối trực tiếp trên thanh công cụ.
 
-### 6. 📑 Xuất Báo Cáo Chuyên Nghiệp (Excel, Word & Lịch .ics)
+### 6. 📑 Xuất Báo Cáo Chuyên Nghiệp (Excel, Word, iCalendar & Google NotebookLM)
 * **Xuất file Excel (`.xlsx` qua `openpyxl`):**
   - **Sheet 1 (Project Summary):** Thẻ KPI tổng quan, điểm số AI, bảng checklist chuẩn bị kèm trạng thái.
   - **Sheet 2 (WBS & Schedule):** Bảng Work Breakdown Structure chi tiết từng Phase/Task, gắn nhãn Milestone (★), cột ngày dự kiến, và tự động tô màu có điều kiện (Done: Xanh lá, Running: Xanh dương, Delayed: Đỏ nhạt).
   - **Sheet 3 (Extension History):** Nhật ký gia hạn, số ngày đã lùi và phân tích từ AI.
 * **Xuất file Word (`.docx` qua `python-docx`):** Bản báo cáo tình trạng dự án chuẩn chỉnh gồm: Tóm tắt dự án, Đánh giá độ khó ban đầu, Danh sách điểm mù, Bảng tiến độ từng Phase, và Nhật ký sự cố.
+* **Xuất file lịch iCalendar (`.ics`):** Tương thích chuẩn RFC 5545 cho Google Calendar, Outlook và Apple Calendar.
+* **Xuất gói tài liệu cho Google NotebookLM (`.md`):** Tệp Markdown tổng hợp toàn diện (Briefing Doc) gồm kiến trúc, lộ trình, điểm mù và các câu hỏi gợi ý để nạp vào Google NotebookLM. Người dùng có thể nhấn nút **"Generate Audio Overview"** trên NotebookLM để tạo ngay một tập **Podcast âm thanh 2 người dẫn chương trình AI** thảo luận chuyên sâu về dự án!
 
 ### 7. 📱 Thích Ứng Thiết Bị Thực Tế Thông Minh (Native Device Adaptive Engine)
 * **Tự động nhận diện thiết bị thực tế theo thời gian thực (Zero-Configuration Responsive):**
